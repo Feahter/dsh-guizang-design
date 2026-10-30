@@ -1,0 +1,4 @@
+# 歸藏工作室：Host 半边（四个 skill 的提供方、展示库页面和作品库接口）。浏览器半边由 package.json 的 dsh.client 声明加载。
+- insert:
+    - id: guizang-studio
+      name: 'dsh-guizang-studio'

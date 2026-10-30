@@ -1,0 +1,29 @@
+{
+  "$comment": "tools/vendor-skills.mjs 生成：各 skill 的来源仓库和提交。不要手改 skills/ 下的文件，改各自的仓库后重新运行脚本。",
+  "skills": [
+    {
+      "name": "guizang-ppt-skill",
+      "repo": "https://github.com/op7418/guizang-ppt-skill",
+      "commit": "93d21bf4a73a851907a6eb00acbf30618236667a",
+      "files": 30
+    },
+    {
+      "name": "guizang-social-card-skill",
+      "repo": "https://github.com/op7418/guizang-social-card-skill",
+      "commit": "64d02d435fb092d3b403455a875e842fc8f29b8b",
+      "files": 41
+    },
+    {
+      "name": "guizang-page-skill",
+      "repo": "https://github.com/op7418/guizang-pages-skill",
+      "commit": "bb39103c94c286ea8e729daf40e5ed9348ac608e",
+      "files": 17
+    },
+    {
+      "name": "humanizer-zh",
+      "repo": "https://github.com/op7418/Humanizer-zh",
+      "commit": "f4518a8eab97b8bfebc66a89d34320a89bef6930",
+      "files": 2
+    }
+  ]
+}

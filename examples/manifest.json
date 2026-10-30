@@ -1,0 +1,69 @@
+{
+  "$comment": "tools/vendor-examples.mjs 生成",
+  "examples": [
+    {
+      "id": "ppt-magazine",
+      "skill": "guizang-ppt-skill",
+      "title": "统一设计系统 · 杂志风 PPT",
+      "summary": "墨水经典主题，WebGL 流体背景，8 页。",
+      "kind": "html",
+      "entry": "ppt-magazine/index.html",
+      "thumb": "thumbs/ppt-magazine.jpg"
+    },
+    {
+      "id": "ppt-swiss",
+      "skill": "guizang-ppt-skill",
+      "title": "统一设计系统 · 瑞士风 PPT",
+      "summary": "克莱因蓝主题，网格点阵背景，8 页。",
+      "kind": "html",
+      "entry": "ppt-swiss/index.html",
+      "thumb": "thumbs/ppt-swiss.jpg"
+    },
+    {
+      "id": "card-editorial",
+      "skill": "guizang-social-card-skill",
+      "title": "设计系统发布 · 杂志风卡片",
+      "summary": "森林墨主题的小红书组图，含一张品牌色生成的卡片。",
+      "kind": "image",
+      "entry": "card-editorial/xhs-01-cover.webp",
+      "files": [
+        "card-editorial/xhs-01-cover.webp",
+        "card-editorial/xhs-03-quote.webp",
+        "card-editorial/xhs-04-pipeline.webp",
+        "card-editorial/xhs-brand.webp"
+      ]
+    },
+    {
+      "id": "card-swiss",
+      "skill": "guizang-social-card-skill",
+      "title": "设计系统发布 · 瑞士风卡片",
+      "summary": "柠檬黄主题的小红书组图。",
+      "kind": "image",
+      "entry": "card-swiss/xhs-01-cover.webp",
+      "files": [
+        "card-swiss/xhs-01-cover.webp",
+        "card-swiss/xhs-02-compare.webp",
+        "card-swiss/xhs-04-apca.webp",
+        "card-swiss/xhs-07-takeaway.webp"
+      ]
+    },
+    {
+      "id": "page-magazine",
+      "skill": "guizang-page-skill",
+      "title": "独立书店如何在算法时代活下来",
+      "summary": "杂志风解释模式，牛皮纸主题。",
+      "kind": "html",
+      "entry": "page-magazine/index.html",
+      "thumb": "thumbs/page-magazine.jpg"
+    },
+    {
+      "id": "page-swiss",
+      "skill": "guizang-page-skill",
+      "title": "Margin 2.0 发布说明",
+      "summary": "瑞士风忠实模式，品牌色 #00B386 生成的主题。",
+      "kind": "html",
+      "entry": "page-swiss/index.html",
+      "thumb": "thumbs/page-swiss.jpg"
+    }
+  ]
+}

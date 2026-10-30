@@ -11,53 +11,51 @@ a { color: inherit; text-decoration: none; }
 button, input { font: inherit; color: inherit; }
 button { background: none; border: 0; cursor: pointer; }
 
-/* ---------- 顶栏 ---------- */
-.appbar { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--line); }
-.appbar-in { max-width: var(--app-max); margin: 0 auto; padding: 0 var(--sp-7); height: 56px; display: flex; align-items: center; gap: var(--sp-7); }
-.brand { display: flex; align-items: center; gap: var(--sp-3); font-weight: 600; font-size: 15px; white-space: nowrap; }
-.brand-mark { width: 18px; height: 18px; background:
-  linear-gradient(#002FA7, #002FA7) 0 0 / 8px 8px no-repeat,
-  linear-gradient(#c2410c, #c2410c) 10px 0 / 8px 8px no-repeat,
-  linear-gradient(#4a6400, #4a6400) 0 10px / 8px 8px no-repeat,
-  linear-gradient(#0a0a0a, #0a0a0a) 10px 10px / 8px 8px no-repeat; }
+/* ---------- 顶栏：品牌 | 导航（当前页墨色实底） | 版本 ---------- */
+.appbar { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--ink); }
+.appbar-in { max-width: var(--app-max); margin: 0 auto; padding: 0 var(--sp-7); height: 60px; display: flex; align-items: center; gap: var(--sp-8); }
+.brand { display: flex; align-items: center; gap: var(--sp-3); font-weight: 600; font-size: 16px; letter-spacing: -.01em; white-space: nowrap; }
+.brand-mark { width: 20px; height: 20px; background:
+  linear-gradient(#002FA7, #002FA7) 0 0 / 9px 9px no-repeat,
+  linear-gradient(#FF6B35, #FF6B35) 11px 0 / 9px 9px no-repeat,
+  linear-gradient(#C5E803, #C5E803) 0 11px / 9px 9px no-repeat,
+  linear-gradient(#FFD500, #FFD500) 11px 11px / 9px 9px no-repeat; }
 .brand-mark img { width: 100%; height: 100%; display: block; }
 .badge { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; color: var(--text-helper); border: 1px solid var(--line); padding: 0 6px; line-height: 18px; }
-.tabs { display: flex; height: 100%; overflow-x: auto; scrollbar-width: none; }
-.tabs a { display: flex; align-items: center; padding: 0 var(--sp-5); color: var(--text-secondary); white-space: nowrap; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-.tabs a:hover { color: var(--ink); }
-.tabs a.on { color: var(--ink); border-bottom-color: var(--ink); }
-.tab-count { margin-left: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--text-helper); }
+.tabs { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.tabs a { height: 32px; display: flex; align-items: center; padding: 0 var(--sp-4); color: var(--text-secondary); white-space: nowrap; font-size: 13px; font-weight: 500; }
+.tabs a:hover { background: var(--grey-1); color: var(--ink); }
+.tabs a.on { background: var(--ink); color: var(--paper); }
+.appbar .ver { margin-left: auto; font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; color: var(--text-helper); white-space: nowrap; }
 
 .app { max-width: var(--app-max); margin: 0 auto; padding: var(--sp-8) var(--sp-7) var(--sp-12); }
 
 /* ---------- 区块标题 ---------- */
 .sec { margin-top: var(--sp-10); }
 .sec:first-child { margin-top: 0; }
-.sec-head { display: flex; align-items: baseline; gap: var(--sp-4); margin-bottom: var(--sp-5); padding-top: var(--sp-4); border-top: 2px solid var(--ink); }
-.sec-head h2 { font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
-.sec-head .count { font-family: var(--font-mono); font-size: 12px; color: var(--text-helper); }
-.sec-head .more { margin-left: auto; font-weight: 500; color: var(--text-secondary); }
+.sec-head { display: flex; align-items: baseline; gap: var(--sp-4); margin-bottom: var(--sp-6); padding-top: var(--sp-5); border-top: 2px solid var(--ink); }
+.sec-head h2 { font-size: var(--fs-heading); font-weight: var(--fw-heading); letter-spacing: var(--ls-heading); line-height: 1.15; }
+.sec-head .more { margin-left: auto; font-size: 13px; font-weight: 500; color: var(--text-secondary); }
 .sec-head .more:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.sec-desc { color: var(--text-secondary); margin: calc(-1 * var(--sp-3)) 0 var(--sp-5); max-width: 60em; line-height: 1.7; }
 .page-head { margin-bottom: var(--sp-7); padding-top: var(--sp-4); border-top: 2px solid var(--ink); }
-.page-head h1 { font-size: 24px; font-weight: 600; letter-spacing: -.02em; }
+.page-head h1 { font-size: 2.6rem; font-weight: var(--fw-display); letter-spacing: -.025em; line-height: 1.1; }
 .page-head p { color: var(--text-secondary); margin-top: var(--sp-3); max-width: 60em; line-height: 1.7; }
 
-/* ---------- 四个 skill：横向扁卡片，白字；ASCII 只在右下角 ---------- */
+/* ---------- 四个 skill：原来的四个瑞士风锚点色，水球动效在右侧；文字统一放在左上角的墨色块里（白字） ---------- */
 .skillcards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-4); }
 .skillcard {
   position: relative; overflow: hidden; isolation: isolate;
-  height: 132px; padding: var(--sp-5) var(--sp-6); text-align: left; color: #fff;
-  display: flex; flex-direction: column; justify-content: flex-start; gap: var(--sp-2);
+  height: 136px; padding: var(--sp-4); text-align: left; background: var(--accent);
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0;
   transition: transform .2s var(--ease-standard);
 }
-.skillcard[data-theme="ikb"] { background: var(--accent); }
-.skillcard[data-theme="safety-orange"], .skillcard[data-theme="lemon-green"] { background: var(--accent-ink); }
-.skillcard[data-theme="ink"] { background: var(--ink); }
 .skillcard canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 .skillcard:hover, .skillcard:focus-visible { transform: translateY(-2px); outline: none; }
 .skillcard:focus-visible { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink); }
-.skillcard .sc-title { font-size: 22px; font-weight: 600; letter-spacing: -.01em; line-height: 1.2; }
-.skillcard .sc-blurb { font-size: 13px; line-height: 1.5; opacity: .82; max-width: 15em; }
+.skillcard .sc-title, .skillcard .sc-blurb { background: var(--ink); color: #fff; padding: 5px 10px; }
+.skillcard .sc-title { font-size: 18px; font-weight: 600; letter-spacing: -.01em; line-height: 1.3; }
+.skillcard .sc-blurb { font-size: 12px; line-height: 1.4; color: rgba(255,255,255,.78); padding-top: 0; }
 
 /* ---------- 作品 / 示例卡片：点卡片打开，「做同款」是唯一的按钮，删除是右上角的垃圾桶 ---------- */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--sp-6) var(--sp-5); }
@@ -108,6 +106,14 @@ button { background: none; border: 0; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 .toolbar .result { margin-left: auto; color: var(--text-helper); font-size: 12px; font-family: var(--font-mono); }
 
+/* 官方示例：不放图，紧凑列表 */
+.examples { border-top: 1px solid var(--line); }
+.example { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: var(--sp-5); padding: var(--sp-4) 0; border-bottom: 1px solid var(--line); }
+.example .ex-title { font-weight: 600; }
+.example .ex-sub { color: var(--text-helper); font-size: 12px; margin-top: 2px; display: flex; gap: 10px; align-items: center; }
+.example .ex-open { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+.example .ex-open:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+
 /* 专栏 */
 .columns { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--sp-4); margin-bottom: var(--sp-8); }
 .column { display: flex; align-items: center; gap: var(--sp-5); padding: var(--sp-4) var(--sp-5); background: var(--grey-1); }
@@ -124,7 +130,7 @@ button { background: none; border: 0; cursor: pointer; }
 .flow .btn { align-self: flex-start; margin-top: auto; }
 
 /* ---------- 语气档案 ---------- */
-.voice { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--sp-5); align-items: start; }
+.voice { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--sp-5); align-items: stretch; }
 .panel { padding: var(--sp-6); background: var(--grey-1); }
 .panel.line { background: var(--paper); border: 1px solid var(--line); }
 .panel h3 { font-size: 15px; font-weight: 600; margin-bottom: var(--sp-3); }

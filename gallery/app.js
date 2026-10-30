@@ -6,9 +6,9 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 // 每个 skill 对应一个瑞士风主题（卡片底色），作品卡片上的小色块也用它
 const META = {
   'guizang-ppt-skill': { label: '网页 PPT', short: 'PPT', theme: 'ikb', dot: '#002FA7' },
-  'guizang-social-card-skill': { label: '图文卡片', short: '卡片', theme: 'safety-orange', dot: '#c2410c' },
-  'guizang-page-skill': { label: '网页排版', short: '网页', theme: 'lemon-green', dot: '#4a6400' },
-  'humanizer-zh': { label: '去 AI 味', short: '去 AI 味', theme: 'ink', dot: '#0a0a0a' },
+  'guizang-social-card-skill': { label: '图文卡片', short: '卡片', theme: 'safety-orange', dot: '#FF6B35' },
+  'guizang-page-skill': { label: '网页排版', short: '网页', theme: 'lemon-green', dot: '#C5E803' },
+  'humanizer-zh': { label: '去 AI 味', short: '去 AI 味', theme: 'lemon', dot: '#FFD500' },
   'guizang-voice': { label: '语气档案', short: '语气', theme: 'ikb', dot: '#737373' },
 }
 const meta = (name) => META[name] || { label: name || '其他', short: name || '其他', dot: '#a1a1aa' }
@@ -62,8 +62,16 @@ function flowCard(r) {
     <button class="btn" data-recipe="${esc(r.id)}">使用工作流</button>
   </article>`
 }
-function sec(title, { count, more, desc } = {}) {
-  return `<div class="sec-head"><h2>${esc(title)}</h2>${count != null ? `<span class="count">${count}</span>` : ''}${more ? `<a class="more" href="${more}">查看全部 →</a>` : ''}</div>${desc ? `<p class="sec-desc">${desc}</p>` : ''}`
+function sec(title, { more, desc } = {}) {
+  return `<div class="sec-head"><h2>${esc(title)}</h2>${more ? `<a class="more" href="${more}">查看全部 →</a>` : ''}</div>${desc ? `<p class="sec-desc">${desc}</p>` : ''}`
+}
+// 官方示例：不放图，一行一份
+function exampleRow(w) {
+  return `<div class="example">
+    <div><div class="ex-title">${esc(w.title)}</div><div class="ex-sub">${chip(w.skill)}<span>${esc(w.summary || '')}</span></div></div>
+    <a class="ex-open" href="${esc(w.url)}" target="_blank" rel="noopener">打开</a>
+    <button class="btn" data-next="${esc(w.id)}" title="用这份示例的主题和版式，在新对话里做一份你的内容">做同款</button>
+  </div>`
 }
 const emptyWorks = `<div class="empty">还没有作品。用上面任意一个 skill 做完一份，它会自己登记到这里；也可以手动登记：<br><br><code>node &lt;插件目录&gt;/scripts/library.mjs add &lt;HTML 文件或卡片任务目录&gt; --skill guizang-ppt-skill --title "标题"</code></div>`
 
@@ -117,22 +125,22 @@ const VIEWS = {
           <span class="sc-title">${esc(s.title)}</span>
           <span class="sc-blurb">${esc(s.short)}</span>
         </button>`).join('')}</div></section>
-      <section class="sec">${sec('我的作品', { count: works.length, more: works.length > 8 ? '#/works' : null })}
+      <section class="sec">${sec('我的作品', { more: works.length > 8 ? '#/works' : null })}
         ${works.length ? `<div class="grid">${works.slice(0, 8).map((w) => workCard(w, { removable: true })).join('')}</div>` : emptyWorks}
       </section>
-      <section class="sec">${sec('内容生产工作流', { count: recipes.length, more: '#/workflows' })}
+      <section class="sec">${sec('内容生产工作流', { more: '#/workflows' })}
         <div class="flows">${recipes.slice(0, 3).map(flowCard).join('')}</div>
       </section>
       <section class="sec">${sec('语气档案', { more: '#/voice', desc: esc(VOICE_DESC) })}${voicePanel(false)}</section>
-      <section class="sec">${sec('官方示例', { count: examples.length, more: '#/examples' })}
-        <div class="grid">${examples.slice(0, 4).map((w) => workCard(w, { removable: false })).join('')}</div>
+      <section class="sec">${sec('官方示例', { more: '#/examples' })}
+        <div class="examples">${examples.slice(0, 4).map(exampleRow).join('')}</div>
       </section>`
   },
   works() {
     const { works, columns } = data
     const shown = filterWorks(works, state.skill, state.q)
     return `<div class="page-head"><h1>我的作品</h1><p>点卡片打开作品；「做同款」会在新对话里按这份作品的主题和版式，做一份新内容。连载按专栏归在一起，可以直接做新一期。</p></div>
-      ${columns.length ? `${sec('专栏', { count: columns.length })}<div class="columns">${columns.map((c) => `
+      ${columns.length ? `${sec('专栏')}<div class="columns">${columns.map((c) => `
         <div class="column"><div class="c-body"><div class="c-name">${esc(c.name)}</div><div class="c-meta">${c.issues} 期 · 最近：${esc(c.latest.title)} · ${date(c.latest.updatedAt)}</div></div>
         <button class="btn" data-column="${esc(c.name)}">做新一期</button></div>`).join('')}</div>` : ''}
       <div class="toolbar"><input class="search" id="q" type="search" placeholder="搜索标题、专栏、主题" value="${esc(state.q)}">${seg('skill', works)}<span class="result">${shown.length} / ${works.length}</span></div>
@@ -147,9 +155,9 @@ const VIEWS = {
   },
   examples() {
     const shown = data.examples.filter((w) => state.exSkill === 'all' || w.skill === state.exSkill)
-    return `<div class="page-head"><h1>官方示例</h1><p>点卡片打开示例；「做同款」会在新对话里按这份示例的主题和版式，做一份你的内容。</p></div>
+    return `<div class="page-head"><h1>官方示例</h1><p>「做同款」会在新对话里按这份示例的主题和版式，做一份你的内容。</p></div>
       <div class="toolbar">${seg('exSkill', data.examples)}<span class="result">${shown.length} / ${data.examples.length}</span></div>
-      <div class="grid">${shown.map((w) => workCard(w, { removable: false })).join('')}</div>`
+      <div class="examples">${shown.map(exampleRow).join('')}</div>`
   },
 }
 
@@ -159,7 +167,6 @@ function render() {
   if (!data) return
   const view = VIEWS[route()] ? route() : 'home'
   document.querySelectorAll('.tabs a').forEach((a) => a.classList.toggle('on', a.dataset.view === view))
-  $('#tab-works').textContent = data.works.length || ''
   const keepFocus = document.activeElement?.id === 'q'
   $('#app').innerHTML = VIEWS[view]() + `<footer class="foot">dsh-guizang-design · ${data.skills.map((s) => `${s.name}@${s.source?.commit?.slice(0, 7) || '—'}`).join(' · ')}</footer>`
   if (keepFocus) { const q = $('#q'); q.focus(); q.setSelectionRange(q.value.length, q.value.length) }
@@ -182,55 +189,83 @@ const io = new IntersectionObserver((entries) => {
 }, { rootMargin: '200px' })
 function mountLive() { document.querySelectorAll('.thumb[data-live]').forEach((b) => io.observe(b)) }
 
-// ---------- skill 卡片的 ASCII 动效 ----------
-// 和 PPT 瑞士风封面的 ASCII 呼吸场同一个算法（guizang-design effects/gz-effects.js），
-// 平时停在一帧静态画面，鼠标移上去才播放；字色取卡片的「色块上的文字色」
-const GLYPHS = ' .:-=+*#%@'
+// ---------- skill 卡片的水球动效 ----------
+// 几个水球在卡片右侧慢慢游动，靠近时融成一团（metaball 场）。两层：
+//   底层：低分辨率场强图，柔和的半透明水球；上层：按场强疏密排的 ASCII 字符，描出水球的体积。
+// 平时停在一帧；鼠标移上去速度渐渐起来，移开后慢慢停下。字色取卡片的 accent-on（蓝、橙上白色，黄、绿上墨色）
+const GLYPHS = ' .·:-=+*#'
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
-function asciiCard(card, seed) {
+function blobCard(card, seed) {
   const canvas = $('canvas', card)
   const ctx = canvas.getContext('2d')
-  const cell = 14
-  let t = 12.5 + seed * 3.7, raf = 0, last = 0, w = 0, h = 0, dpr = 1
+  const low = document.createElement('canvas'), lctx = low.getContext('2d')
+  const cell = 9, LOW = 4
+  // 水球都在右边 55% 的范围里游，躲开左上角的文字
+  const rnd = (i) => { const x = Math.sin(seed * 97.13 + i * 12.9898) * 43758.5453; return x - Math.floor(x) }
+  const blobs = Array.from({ length: 5 }, (_, i) => ({
+    bx: 0.6 + rnd(i) * 0.24, by: 0.3 + rnd(i + 9) * 0.45,
+    ax: 0.05 + rnd(i + 3) * 0.08, ay: 0.12 + rnd(i + 5) * 0.16,
+    sp: 0.35 + rnd(i + 7) * 0.45, ph: rnd(i + 11) * 6.28, r: 0.09 + rnd(i + 13) * 0.07,
+  }))
+  let t = 4 + seed * 2.3, speed = 0, target = 0, raf = 0, last = 0, w = 0, h = 0, dpr = 1, rgb = '255,255,255'
   function size() {
     const r = card.getBoundingClientRect()
     dpr = Math.min(devicePixelRatio || 1, 2)
     w = Math.round(r.width); h = Math.round(r.height)
     canvas.width = w * dpr; canvas.height = h * dpr
+    low.width = Math.ceil(w / LOW); low.height = Math.ceil(h / LOW)
+    const on = getComputedStyle(card).getPropertyValue('--accent-on').trim() || '#ffffff'
+    const m = on.match(/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
+    rgb = m ? [m[1], m[2], m[3]].map((x) => parseInt(x, 16)).join(',') : '255,255,255'
   }
+  const pos = (b) => [w * (b.bx + b.ax * Math.sin(t * b.sp + b.ph)), h * (b.by + b.ay * Math.cos(t * b.sp * 0.8 + b.ph * 1.3)), (b.r * h) ** 2]
+  function field(x, y, P) { let f = 0; for (const [bx, by, r2] of P) { const dx = x - bx, dy = y - by; f += r2 / (dx * dx + dy * dy + 1) } return f }
   function draw() {
-    const color = '#ffffff'
+    const P = blobs.map(pos)
+    // 底层：柔和的水球
+    const img = lctx.createImageData(low.width, low.height)
+    const [cr, cg, cb] = rgb.split(',').map(Number)
+    for (let y = 0; y < low.height; y++) for (let x = 0; x < low.width; x++) {
+      const f = field(x * LOW, y * LOW, P)
+      const a = Math.min(1, Math.max(0, (f - 0.8) / 0.5))
+      const i = (y * low.width + x) * 4
+      img.data[i] = cr; img.data[i + 1] = cg; img.data[i + 2] = cb; img.data[i + 3] = a * a * (3 - 2 * a) * 34
+    }
+    lctx.putImageData(img, 0, 0)
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     ctx.clearRect(0, 0, w, h)
-    ctx.font = '500 12px "JetBrains Mono", ui-monospace, monospace'
-    ctx.textBaseline = 'top'
-    ctx.fillStyle = color
-    const cols = Math.ceil(w / cell), rows = Math.ceil(h / cell), tt = t * 0.55
-    for (let r = 0; r < rows; r++) for (let k = 0; k < cols; k++) {
-      const n = (Math.sin(k * 0.18 + tt) + Math.sin(r * 0.24 - tt * 0.7) + Math.sin((k + r) * 0.12 + tt * 0.45) + Math.sin(Math.hypot(k - cols * 0.75, r - rows * 0.3) * 0.16 - tt * 0.55)) / 4
-      const v = (n + 1) / 2
-      if (v < 0.3) continue
-      // 只在右下角：离右下角越远越淡，文字所在的左上方完全不画
-      const d = Math.hypot((cols - k) / cols * 1.15, (rows - r) / rows)
-      const fade = Math.max(0, 1 - d / 0.95) ** 1.4
-      if (fade <= 0.01) continue
-      const g = GLYPHS[Math.min(GLYPHS.length - 1, Math.floor(v * GLYPHS.length))]
-      if (g === ' ') continue
-      ctx.globalAlpha = (0.12 + (v - 0.3) * 0.7) * fade
-      ctx.fillText(g, k * cell, r * cell)
+    ctx.imageSmoothingEnabled = true
+    ctx.drawImage(low, 0, 0, w, h)
+    // 上层：字符
+    ctx.font = '500 9px "JetBrains Mono", ui-monospace, monospace'
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'center'
+    for (let y = cell / 2; y < h; y += cell) for (let x = cell / 2; x < w; x += cell) {
+      const f = field(x, y, P)
+      if (f < 0.55) continue
+      const v = Math.min(1, (f - 0.55) / 3)
+      const g = GLYPHS[1 + Math.min(GLYPHS.length - 2, Math.floor(Math.sqrt(v) * (GLYPHS.length - 1)))]
+      ctx.fillStyle = `rgba(${rgb},${(0.22 + v * 0.55).toFixed(3)})`
+      ctx.fillText(g, x, y)
     }
-    ctx.globalAlpha = 1
   }
   function loop(now) {
-    if (now - last >= 1000 / 30) { t += (now - (last || now)) / 1000; last = now; draw() }
-    raf = requestAnimationFrame(loop)
+    const dt = last ? Math.min(0.05, (now - last) / 1000) : 0
+    last = now
+    speed += (target - speed) * Math.min(1, dt * 4)
+    t += dt * speed
+    draw()
+    if (target > 0 || speed > 0.01) raf = requestAnimationFrame(loop)
+    else { raf = 0; last = 0 }
   }
-  card.addEventListener('mouseenter', () => { if (!reduceMotion && !raf) { last = 0; raf = requestAnimationFrame(loop) } })
-  card.addEventListener('mouseleave', () => { cancelAnimationFrame(raf); raf = 0 })
+  const go = (on) => { if (reduceMotion) return; target = on ? 1 : 0; if (!raf) { last = 0; raf = requestAnimationFrame(loop) } }
+  card.addEventListener('mouseenter', () => go(true))
+  card.addEventListener('mouseleave', () => go(false))
+  card.addEventListener('focus', () => go(true))
+  card.addEventListener('blur', () => go(false))
   new ResizeObserver(() => { size(); draw() }).observe(card)
   document.fonts.ready.then(draw)
 }
-function mountAscii() { document.querySelectorAll('.skillcard').forEach((c, i) => asciiCard(c, i)) }
+function mountAscii() { document.querySelectorAll('.skillcard').forEach((c, i) => blobCard(c, i + 1)) }
 
 // ---------- 交互 ----------
 document.addEventListener('click', async (e) => {

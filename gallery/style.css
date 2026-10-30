@@ -26,7 +26,11 @@ svg.ic { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none
 .nav a:hover { background: var(--grey-1); color: var(--ink); }
 .nav a.on { background: var(--ink); color: var(--paper); }
 .nav-count { margin-left: auto; font-family: var(--font-mono); font-size: 11px; opacity: .7; }
-.rail-foot { margin-top: auto; padding: 0 var(--sp-3); font-family: var(--font-mono); font-size: 10px; line-height: 1.7; color: var(--text-helper); overflow-wrap: anywhere; }
+.rail-foot { margin-top: auto; padding: var(--sp-4) var(--sp-3) 0; border-top: 1px solid var(--line-subtle); }
+.me { display: flex; align-items: center; gap: var(--sp-3); }
+.me img { width: 32px; height: 32px; object-fit: cover; flex: none; }
+.me-name { font-weight: 600; font-size: 13px; }
+.me-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-helper); }
 
 .main { min-width: 0; padding: var(--sp-8) var(--sp-9) var(--sp-12); max-width: 1180px; }
 
@@ -149,12 +153,11 @@ svg.ic { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none
 
 /* ---------- 官方示例：表格式列表 ---------- */
 .table { background: var(--paper); border: 1px solid var(--line-subtle); }
-.row { display: grid; grid-template-columns: minmax(0, 1fr) 110px auto; align-items: center; gap: var(--sp-5); padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--line-subtle); }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--sp-5); padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--line-subtle); }
 .row:first-child { border-top: 0; }
-.row.th { padding-top: var(--sp-3); padding-bottom: var(--sp-3); background: var(--grey-1); color: var(--text-helper); }
 .row .r-title { font-weight: 600; }
 .row .r-sub { margin-top: 2px; font-size: 12px; color: var(--text-helper); }
-.row .r-skill { display: flex; align-items: center; gap: var(--sp-2); font-size: 12px; color: var(--text-secondary); }
+.row .r-skill { display: inline-flex; align-items: center; margin-left: var(--sp-3); font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: .06em; color: var(--text-secondary); vertical-align: 1px; }
 .row .r-act { display: flex; gap: var(--sp-2); }
 
 .empty { padding: var(--sp-8); background: var(--paper); border: 1px dashed var(--grey-2); color: var(--text-secondary); text-align: center; line-height: 1.8; }

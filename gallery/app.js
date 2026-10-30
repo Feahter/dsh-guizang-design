@@ -90,10 +90,8 @@ function flowCard(r, i) {
 
 function exampleTable(list) {
   return `<div class="table">
-    <div class="row th mono"><span>示例</span><span>Skill</span><span></span></div>
     ${list.map((w) => `<div class="row">
-      <div><div class="r-title">${esc(w.title)}</div><div class="r-sub">${esc(w.summary || '')}</div></div>
-      <div class="r-skill">${skillTag(w.skill)}</div>
+      <div><div class="r-title">${esc(w.title)}<span class="r-skill">${skillTag(w.skill)}</span></div><div class="r-sub">${esc(w.summary || '')}</div></div>
       <div class="r-act"><a class="btn ghost" href="${esc(w.url)}" target="_blank" rel="noopener">打开</a><button class="btn" data-next="${esc(w.id)}">做同款</button></div>
     </div>`).join('')}
   </div>`
@@ -200,7 +198,8 @@ function render() {
   const view = VIEWS[route()] ? route() : 'home'
   document.querySelectorAll('.nav a').forEach((a) => a.classList.toggle('on', a.dataset.view === view))
   document.querySelectorAll('[data-count="works"]').forEach((el) => (el.textContent = data.works.length || ''))
-  $('#rail-foot').innerHTML = `dsh-guizang-design<br>${data.skills.map((s) => `${esc(s.name)}@${esc(s.source?.commit?.slice(0, 7) || '—')}`).join('<br>')}`
+  $('#rail-foot').innerHTML = `<div class="me"><img src="avatar.jpg" alt=""><div><div class="me-name">歸藏</div><div class="me-sub">dsh-guizang-design</div></div></div>`
+  $('#rail-foot').title = data.skills.map((s) => `${s.name}@${s.source?.commit?.slice(0, 7) || '—'}`).join('\n')
   const keepFocus = document.activeElement?.id === 'q'
   $('#app').innerHTML = VIEWS[view]()
   if (keepFocus) { const q = $('#q'); q.focus(); q.setSelectionRange(q.value.length, q.value.length) }
@@ -225,15 +224,14 @@ const io = new IntersectionObserver((entries) => {
 function mountLive() { document.querySelectorAll('.thumb[data-live]').forEach((b) => io.observe(b)) }
 
 // ---------- 横幅动画区：融合的水球 ----------
-// 几个水球慢慢游动，靠近时融成一团（metaball 场）。两层：低分辨率场强图画柔和的水球，
-// 上层按场强疏密排 ASCII 字符描出体积。平时停在一帧；鼠标移上去渐渐动起来，移开后慢慢停下。
+// 几个水球慢慢游动，靠近时融成一团（metaball 场）。形状完全由 ASCII 字符组成：场强越高字符越密、越实，
+// 边缘只剩稀疏的点。平时停在一帧；鼠标移上去渐渐动起来，移开后慢慢停下。
 // 字色取该主题的 accent-on（蓝、橙上白色，黄、绿上墨色）——动画区里没有文字，只有纹理。
 const GLYPHS = ' .·:-=+*#'
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
 function blobArt(banner, seed) {
   const art = $('.b-art', banner), canvas = $('canvas', art), ctx = canvas.getContext('2d')
-  const low = document.createElement('canvas'), lctx = low.getContext('2d')
-  const cell = 9, LOW = 4
+  const cell = 8
   const rnd = (i) => { const x = Math.sin(seed * 97.13 + i * 12.9898) * 43758.5453; return x - Math.floor(x) }
   const blobs = Array.from({ length: 5 }, (_, i) => ({
     bx: 0.25 + rnd(i) * 0.5, by: 0.3 + rnd(i + 9) * 0.45,
@@ -246,7 +244,6 @@ function blobArt(banner, seed) {
     dpr = Math.min(devicePixelRatio || 1, 2)
     w = Math.round(r.width); h = Math.round(r.height)
     canvas.width = w * dpr; canvas.height = h * dpr
-    low.width = Math.max(1, Math.ceil(w / LOW)); low.height = Math.max(1, Math.ceil(h / LOW))
     const m = (getComputedStyle(banner).getPropertyValue('--accent-on').trim() || '#ffffff').match(/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i)
     rgb = m ? [m[1], m[2], m[3]].map((x) => parseInt(x, 16)) : [255, 255, 255]
   }
@@ -256,23 +253,15 @@ function blobArt(banner, seed) {
   function draw() {
     if (!w || !h) return
     const P = blobs.map(pos)
-    const img = lctx.createImageData(low.width, low.height)
-    for (let y = 0; y < low.height; y++) for (let x = 0; x < low.width; x++) {
-      const a = Math.min(1, Math.max(0, (field(x * LOW, y * LOW, P) - 0.8) / 0.5))
-      const i = (y * low.width + x) * 4
-      img.data[i] = rgb[0]; img.data[i + 1] = rgb[1]; img.data[i + 2] = rgb[2]; img.data[i + 3] = a * a * (3 - 2 * a) * 34
-    }
-    lctx.putImageData(img, 0, 0)
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     ctx.clearRect(0, 0, w, h)
-    ctx.drawImage(low, 0, 0, w, h)
-    ctx.font = '500 9px "JetBrains Mono", ui-monospace, monospace'
+    ctx.font = '500 8px "JetBrains Mono", ui-monospace, monospace'
     ctx.textBaseline = 'middle'; ctx.textAlign = 'center'
     for (let y = cell / 2; y < h; y += cell) for (let x = cell / 2; x < w; x += cell) {
       const f = field(x, y, P)
-      if (f < 0.55) continue
-      const v = Math.min(1, (f - 0.55) / 3)
-      ctx.fillStyle = `rgba(${rgb.join(',')},${(0.22 + v * 0.55).toFixed(3)})`
+      if (f < 0.6) continue
+      const v = Math.min(1, (f - 0.6) / 2.6)
+      ctx.fillStyle = `rgba(${rgb.join(',')},${(0.35 + v * 0.6).toFixed(3)})`
       ctx.fillText(GLYPHS[1 + Math.min(GLYPHS.length - 2, Math.floor(Math.sqrt(v) * (GLYPHS.length - 1)))], x, y)
     }
   }

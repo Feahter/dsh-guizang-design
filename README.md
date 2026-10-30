@@ -79,11 +79,25 @@ PPT、卡片、网页三个 skill 用同一套 token：
 - Node.js `22.19` 及以上
 - pnpm（dsh 安装插件时用）
 
+从 npm 安装：
+
+```bash
+dsh plugin --profile web add dsh-guizang-design
+```
+
+或者从 GitHub 安装（跟着 main 分支的最新提交）：
+
 ```bash
 dsh plugin --profile web add github:op7418/dsh-guizang-design
 ```
 
 dsh web 正在运行的话，重启后刷新页面，侧栏会出现「歸藏设计」。
+
+`dsh plugin` 会把后面的参数原样交给 pnpm，所以 pnpm 的写法都能用，比如指定版本 `add dsh-guizang-design@0.1.0`。升级到最新版：
+
+```bash
+dsh plugin --profile web update dsh-guizang-design --latest
+```
 
 另外两项按需准备：
 

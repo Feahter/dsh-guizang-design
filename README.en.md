@@ -65,11 +65,25 @@ Every trait needs at least two pieces of evidence from the samples, and you revi
 
 Requirements: dsh `>=0.2.1-rc.2 <0.3.0`, Node.js `22.19+`, and pnpm.
 
+From npm:
+
+```bash
+dsh plugin --profile web add dsh-guizang-design
+```
+
+Or from GitHub (tracks the latest commit on main):
+
 ```bash
 dsh plugin --profile web add github:op7418/dsh-guizang-design
 ```
 
 Restart dsh web and refresh; **歸藏设计** appears in the sidebar.
+
+`dsh plugin` passes its arguments to pnpm unchanged, so any pnpm form works, e.g. `add dsh-guizang-design@0.1.0` for a specific version. To upgrade:
+
+```bash
+dsh plugin --profile web update dsh-guizang-design --latest
+```
 
 - Card rendering uses Playwright's Chromium. If the first render reports a missing browser, run `npx playwright install chromium`.
 - Page PDF / long-image export uses your local Chrome (or `CHROME_PATH`).

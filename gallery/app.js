@@ -198,8 +198,8 @@ function render() {
   const view = VIEWS[route()] ? route() : 'home'
   document.querySelectorAll('.nav a').forEach((a) => a.classList.toggle('on', a.dataset.view === view))
   document.querySelectorAll('[data-count="works"]').forEach((el) => (el.textContent = data.works.length || ''))
-  $('#rail-foot').innerHTML = `<div class="me"><img src="avatar.jpg" alt=""><div><div class="me-name">歸藏</div><div class="me-sub">dsh-guizang-design</div></div></div>`
-  $('#rail-foot').title = data.skills.map((s) => `${s.name}@${s.source?.commit?.slice(0, 7) || '—'}`).join('\n')
+  // 左下角：插件版本和打包进来的各 skill 的提交
+  $('#rail-foot').innerHTML = `<div class="v-head">插件 v${esc(data.version || '')}</div>${data.skills.map((s) => `<div class="v-row" title="${esc(s.name)}"><span>${esc(meta(s.name).short)}</span><span>${esc(s.source?.commit?.slice(0, 7) || '—')}</span></div>`).join('')}`
   const keepFocus = document.activeElement?.id === 'q'
   $('#app').innerHTML = VIEWS[view]()
   if (keepFocus) { const q = $('#q'); q.focus(); q.setSelectionRange(q.value.length, q.value.length) }

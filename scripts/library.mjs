@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 作品库命令行：skill 交付后由模型调用，把作品登记进工作室的展示库。
+// 作品库命令行：skill 交付后由模型调用，把作品登记进歸藏设计的作品库。
 //
 //   node scripts/library.mjs add <HTML 文件 | 任务目录> --skill <skill 名> --title "标题" [--theme 主题id] [--column 专栏] [--note 备注]
 //   node scripts/library.mjs list
@@ -14,7 +14,7 @@ const [cmd, target] = args
 
 if (cmd === 'add' && target) {
   const w = addWork(target, { skill: opt('skill'), title: opt('title'), theme: opt('theme'), column: opt('column'), note: opt('note') })
-  console.log(`已登记：${w.title}（${w.id}，${w.files.length} 个文件）→ 侧栏「工作室」里可以看到`)
+  console.log(`已登记：${w.title}（${w.id}，${w.files.length} 个文件）→ 侧栏「歸藏设计」里可以看到`)
   if (w.kind === 'html') {
     const ok = await makeThumb(join(w.root, w.entry), join(dataDir(), 'thumbs', `${w.id}.jpg`)).catch(() => false)
     if (!ok) console.log('（没能截缩略图，展示库会用实时预览）')

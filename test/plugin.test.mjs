@@ -30,12 +30,12 @@ test('加载正文：<SKILL_ROOT> 换成实际目录，末尾附上插件说明'
   const d = await provider.get(c, {})
   assert.ok(!d.content.includes('<SKILL_ROOT>'))
   assert.ok(d.content.includes(join(ROOT, 'skills', 'guizang-ppt-skill')))
-  assert.match(d.content, /## 在歸藏工作室（DSH 插件）里使用/)
+  assert.match(d.content, /## 在歸藏设计插件（DSH）里使用/)
   assert.match(d.content, /library\.mjs add/)
   assert.match(d.content, /演讲回收/)
   const v = await provider.get((await provider.list({})).find((x) => x.name === 'guizang-voice'), {})
   assert.ok(!v.content.includes('<PLUGIN_ROOT>'))
-  assert.ok(!v.content.includes('在歸藏工作室（DSH 插件）里使用'))
+  assert.ok(!v.content.includes('在歸藏设计插件（DSH）里使用'))
 })
 
 test('作品库：登记、重复登记只更新、卡片目录收图并选首图、移除', () => {
@@ -67,7 +67,7 @@ test('语料档案：note 追加到「对话中学到的」', () => {
   assert.match(text, /## 对话中学到的\n- \d{4}-\d{2}-\d{2}：第一条\n- \d{4}-\d{2}-\d{2}：第二条/)
 })
 
-test('配方和 skill 草稿都以 /skill 名开头，并且引用的 skill 都存在', async () => {
+test('工作流和 skill 草稿都以 /skill 名开头，并且引用的 skill 都存在', async () => {
   const names = new Set((await provider.list({})).map((c) => c.name))
   for (const r of RECIPES) {
     assert.match(r.prompt, /^\/[a-z-]+ /)

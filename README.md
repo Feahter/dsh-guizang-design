@@ -1,14 +1,14 @@
-# 歸藏工作室 · dsh-guizang-design
+# 歸藏设计 · dsh-guizang-design
 
-DeepSeek Harness（dsh）插件。把歸藏的四个 skill 装进 dsh，并在侧栏加一个「工作室」：
+DeepSeek Harness（dsh）插件。把歸藏的四个 skill 装进 dsh，并在侧栏加一个「歸藏设计」页面：
 
 - **网页 PPT**（guizang-ppt-skill）、**图文卡片**（guizang-social-card-skill）、**网页排版**（guizang-page-skill）、**去 AI 味**（humanizer-zh）。前三个共用一套设计系统：同样的杂志风 / 瑞士风主题、字号、字体和背景特效，品牌色按色彩科学生成受约束的主题。
-- **展示库**：官方示例和你做过的作品。每份作品都可以「做同风格的下一份」：在新对话里填好草稿，补上内容就能发。
-- **配方**：跨 skill 的常用组合——一篇文章三种出口、先去 AI 味再排版、演讲回收、品牌套件、封面矩阵、中英双版本。
+- **作品库**：官方示例和你做过的作品。每份作品都可以「做同风格的下一份」：在新对话里填好草稿，补上内容就能发。
+- **内容生产工作流**：跨 skill 的常用组合——一篇文章三种出口、先去 AI 味再排版、演讲回收、品牌套件、封面矩阵、中英双版本。
 - **专栏**：连载的各期放在一起，一键做新一期，沿用上一期的主题和版式。
-- **我的语气**（guizang-voice）：从你写过的文章和对话里的修改意见学习你的写作习惯，存成本机的一份档案；各个 skill 写文案前都会先读它。
+- **语气档案**（guizang-voice）：从你写过的文章、你和 AI 对话时改过的措辞里学习你的写作习惯，存成本机的一份档案。去 AI 味时保留你本来的说法，让 AI 仿写时照着你的语气写。
 
-![工作室](screenshots/1-studio.jpg)
+![歸藏设计](screenshots/1-studio.jpg)
 
 ## 安装
 
@@ -23,7 +23,7 @@ dsh plugin --profile web add github:op7418/dsh-guizang-design
 
 ## 使用
 
-- 侧栏点「工作室」打开展示库；点「开始」「用这个配方」「做同风格的下一份」会开一个新对话并填好草稿。
+- 侧栏点「歸藏设计」打开插件页面；点 skill 卡片、「使用这个工作流」「做同风格的下一份」会开一个新对话并填好草稿。
 - 也可以在输入框里直接打 `/guizang-ppt-skill`、`/guizang-social-card-skill`、`/guizang-page-skill`、`/humanizer-zh`、`/guizang-voice`。
 - skill 交付作品后会自己登记进作品库；手动登记：
 

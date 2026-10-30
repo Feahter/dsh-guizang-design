@@ -73,42 +73,41 @@ PPT、卡片、网页三个 skill 用同一套 token：
 
 ## 安装
 
-需要：
+需要 dsh `0.2.1-rc.2` 及以上、`0.3.0` 以下。
 
-- dsh `0.2.1-rc.2` 及以上、`0.3.0` 以下
-- Node.js `22.19` 及以上
-- pnpm（dsh 安装插件时用）
+### 在插件页面安装（桌面版和网页版都适用，推荐）
 
-从 npm 安装：
+1. 侧栏打开「插件」，点「添加插件」。
+2. 包名填 `dsh-guizang-design`，点安装。
+3. 装完点「立即启用」。直接关掉对话框的话，插件是装上了但没打开，要回到插件列表里把它的开关打开。
+
+侧栏会出现「歸藏设计」。
+
+升级：在插件页面把它卸载，再按上面的步骤装一次（插件页面对第三方插件的升级方式就是这样）。卸载：在插件页面打开它，点「卸载」。
+
+### 用命令行安装（网页版）
+
+自己运行 `dsh web` 的话，也可以用命令行，需要 Node.js `22.19` 及以上和 pnpm：
 
 ```bash
 dsh plugin --profile web add dsh-guizang-design
 ```
 
-或者从 GitHub 安装（跟着 main 分支的最新提交）：
+装完重启 dsh web 再刷新页面。`dsh plugin` 会把后面的参数原样交给 pnpm，所以 pnpm 的写法都能用：
 
 ```bash
-dsh plugin --profile web add github:op7418/dsh-guizang-design
+dsh plugin --profile web add github:op7418/dsh-guizang-design   # 从 GitHub 装，跟着 main 的最新提交
+dsh plugin --profile web add dsh-guizang-design@0.1.0           # 指定版本
+dsh plugin --profile web update dsh-guizang-design --latest     # 升级
+dsh plugin --profile web remove dsh-guizang-design              # 卸载
 ```
 
-dsh web 正在运行的话，重启后刷新页面，侧栏会出现「歸藏设计」。
+用的不是 `web` 这个 profile 时，把 `--profile web` 换成你自己的。**桌面版不能用命令行**：桌面版用的 `desktop` profile 只能由 App 管理，`dsh plugin --profile desktop` 会直接报错，请走插件页面。
 
-`dsh plugin` 会把后面的参数原样交给 pnpm，所以 pnpm 的写法都能用，比如指定版本 `add dsh-guizang-design@0.1.0`。升级到最新版：
-
-```bash
-dsh plugin --profile web update dsh-guizang-design --latest
-```
-
-另外两项按需准备：
+### 按需准备
 
 - **卡片出图**用 Playwright 的 Chromium。第一次出图如果提示缺少浏览器，运行 `npx playwright install chromium`。
 - **网页导出 PDF / 长图**用本机的 Chrome（或用 `CHROME_PATH` 指定）。
-
-卸载：
-
-```bash
-dsh plugin --profile web remove dsh-guizang-design
-```
 
 ## 使用
 

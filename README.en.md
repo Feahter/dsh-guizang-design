@@ -63,32 +63,41 @@ Every trait needs at least two pieces of evidence from the samples, and you revi
 
 ## Install
 
-Requirements: dsh `>=0.2.1-rc.2 <0.3.0`, Node.js `22.19+`, and pnpm.
+Requires dsh `>=0.2.1-rc.2 <0.3.0`.
 
-From npm:
+### From the Plugins page (desktop and web, recommended)
+
+1. Open **Plugins** in the sidebar and click **Add plugin**.
+2. Enter `dsh-guizang-design` as the package and install.
+3. Click **Enable now** when it finishes. If you close the dialog instead, the plugin is installed but off; switch it on in the plugin list.
+
+**歸藏设计** appears in the sidebar.
+
+To upgrade, uninstall it on the Plugins page and install again (that is how the page upgrades third-party plugins). To uninstall, open it on the Plugins page and click **Uninstall**.
+
+### From the command line (web)
+
+If you run `dsh web` yourself you can also use the CLI, which needs Node.js `22.19+` and pnpm:
 
 ```bash
 dsh plugin --profile web add dsh-guizang-design
 ```
 
-Or from GitHub (tracks the latest commit on main):
+Restart dsh web and refresh. `dsh plugin` passes its arguments to pnpm unchanged, so any pnpm form works:
 
 ```bash
-dsh plugin --profile web add github:op7418/dsh-guizang-design
+dsh plugin --profile web add github:op7418/dsh-guizang-design   # from GitHub, tracks main
+dsh plugin --profile web add dsh-guizang-design@0.1.0           # a specific version
+dsh plugin --profile web update dsh-guizang-design --latest     # upgrade
+dsh plugin --profile web remove dsh-guizang-design              # uninstall
 ```
 
-Restart dsh web and refresh; **歸藏设计** appears in the sidebar.
+Replace `--profile web` with your own profile if you use another one. **The desktop app cannot use the CLI**: its `desktop` profile is managed only by the app, and `dsh plugin --profile desktop` exits with an error. Use the Plugins page there.
 
-`dsh plugin` passes its arguments to pnpm unchanged, so any pnpm form works, e.g. `add dsh-guizang-design@0.1.0` for a specific version. To upgrade:
-
-```bash
-dsh plugin --profile web update dsh-guizang-design --latest
-```
+### Optional
 
 - Card rendering uses Playwright's Chromium. If the first render reports a missing browser, run `npx playwright install chromium`.
 - Page PDF / long-image export uses your local Chrome (or `CHROME_PATH`).
-
-Uninstall: `dsh plugin --profile web remove dsh-guizang-design`
 
 ## Usage
 

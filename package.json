@@ -23,7 +23,8 @@
     "icon.png",
     "own-skills",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "README.en.md"
   ],
   "keywords": [
     "dsh-plugin",

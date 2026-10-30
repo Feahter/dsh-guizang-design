@@ -76,3 +76,28 @@ test('工作流和 skill 草稿都以 /skill 名开头，并且引用的 skill �
   }
   for (const s of SKILLS) assert.ok(s.starter.startsWith(`/${s.name} `))
 })
+
+test('聊天记录：多帧 zstd 会话里只取用户亲手发的消息，去掉 /skill 前缀，长消息优先写进素材', async () => {
+  const { zstdCompressSync } = await import('node:zlib')
+  const { userMessages, writeCorpus } = await import('../lib/history.js')
+  const dir = join(home, 'sessions', '--ws--', 'session-abc')
+  mkdirSync(dir, { recursive: true })
+  const ev = (o) => JSON.stringify(o) + '\n'
+  const long = '我写东西习惯先讲结论，再补一个具体的例子。'.repeat(6)
+  const frames = [
+    ev({ type: 'session', version: 4, id: 'session-abc' }),
+    ev({ type: 'session/title', seq: 1, time: 1, data: { title: '测试会话' } }),
+    ev({ type: 'user/message', seq: 2, time: 1793000000000, data: { source: { kind: 'user' }, content: [{ type: 'text', text: `/guizang-ppt-skill ${long}` }] } }),
+    ev({ type: 'user/message', seq: 3, time: 1793000001000, data: { source: { kind: 'skill-invocation' }, content: [{ type: 'text', text: 'skill 正文，不算用户写的'.repeat(5) }] } }),
+    ev({ type: 'user/message', seq: 4, time: 1793000002000, data: { source: { kind: 'user' }, content: [{ type: 'text', text: '好' }] } }),
+  ].map((f) => zstdCompressSync(Buffer.from(f)))
+  writeFileSync(join(dir, 'session.v4.jsonl.zstd'), Buffer.concat(frames))
+  const msgs = userMessages()
+  assert.equal(msgs.length, 2)
+  assert.ok(msgs[0].text.startsWith('我写东西习惯'))
+  assert.equal(msgs[0].title, '测试会话')
+  const out = join(home, 'corpus.md')
+  const r = writeCorpus(out)
+  assert.equal(r.messages, 1)   // 「好」太短，不进素材
+  assert.match(readFileSync(out, 'utf8'), /## 2026-\d\d-\d\d · 测试会话\n\n我写东西习惯/)
+})

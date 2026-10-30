@@ -2,8 +2,10 @@
 // 个人语料档案：guizang-voice skill 用它找到、查看和追加档案。档案是 <dataDir>/voice.md，只在本机。
 //
 //   node scripts/voice.mjs path | show | note "<一条观察>"
+//   node scripts/voice.mjs collect      把 DSH 聊天记录里用户发过的消息整理成学习素材（voice-corpus.md）
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { voicePath } from '../lib/voice.js'
+import { writeCorpus } from '../lib/history.js'
+import { corpusPath, voicePath } from '../lib/voice.js'
 
 const [cmd, text] = process.argv.slice(2)
 const file = voicePath()
@@ -12,6 +14,9 @@ if (cmd === 'path') console.log(file)
 else if (cmd === 'show') {
   if (existsSync(file)) console.log(readFileSync(file, 'utf8'))
   else console.log(`还没有语料档案（${file}）。让用户给 3–10 篇自己写过的文章，按 guizang-voice skill 的步骤建档。`)
+} else if (cmd === 'collect') {
+  const r = writeCorpus(corpusPath())
+  console.log(r.messages ? `从 ${r.sessions} 个会话里整理了 ${r.messages} 条消息（约 ${r.chars} 字）→ ${corpusPath()}` : `${r.sessions} 个会话里还没有 30 字以上的用户消息，可以先让用户给几篇自己写的文章`)
 } else if (cmd === 'note' && text) {
   mkdirSync(file.replace(/\/[^/]+$/, ''), { recursive: true })
   const day = new Date().toISOString().slice(0, 10)
@@ -23,6 +28,6 @@ else if (cmd === 'show') {
   writeFileSync(file, next)
   console.log('已记下')
 } else {
-  console.error('用法：voice.mjs path | show | note "<一条观察>"')
+  console.error('用法：voice.mjs path | show | collect | note "<一条观察>"')
   process.exit(1)
 }

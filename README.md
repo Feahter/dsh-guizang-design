@@ -1,4 +1,4 @@
-# 歸藏工作室 · dsh-guizang-studio
+# 歸藏工作室 · dsh-guizang-design
 
 DeepSeek Harness（dsh）插件。把歸藏的四个 skill 装进 dsh，并在侧栏加一个「工作室」：
 
@@ -15,7 +15,7 @@ DeepSeek Harness（dsh）插件。把歸藏的四个 skill 装进 dsh，并在�
 需要 dsh 0.2.1 以上和 pnpm。
 
 ```bash
-dsh plugin --profile web add github:op7418/dsh-guizang-studio
+dsh plugin --profile web add github:op7418/dsh-guizang-design
 # dsh web 正在运行的话，重启后刷新页面
 ```
 
@@ -35,7 +35,7 @@ dsh plugin --profile web add github:op7418/dsh-guizang-studio
 
 ## 数据放在哪
 
-作品库、缩略图和语料档案都在 `$DSH_HOME/guizang-studio/`（默认 `~/.dsh/guizang-studio/`），只在本机。作品库只记路径，不复制作品文件；移出作品库也不会删除文件。
+作品库、缩略图和语料档案都在 `$DSH_HOME/guizang-design/`（默认 `~/.dsh/guizang-design/`），只在本机。作品库只记路径，不复制作品文件；移出作品库也不会删除文件。
 
 ## 开发
 

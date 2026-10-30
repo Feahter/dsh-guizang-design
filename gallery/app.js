@@ -1,4 +1,4 @@
-// 展示库：读 /guizang-studio/api/catalog，渲染四块。点按钮时把草稿交给外层（插件浏览器半边开新对话）。
+// 展示库：读 /guizang-design/api/catalog，渲染四块。点按钮时把草稿交给外层（插件浏览器半边开新对话）。
 const $ = (s) => document.querySelector(s)
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 const SKILL_LABEL = { 'guizang-ppt-skill': 'PPT', 'guizang-social-card-skill': '卡片', 'guizang-page-skill': '网页', 'humanizer-zh': '去 AI 味' }
@@ -17,13 +17,13 @@ function toast(text) {
 // 在 DSH 里：外层开新对话并填好草稿；单独打开这个页面时：复制草稿
 function start(prompt) {
   if (window.parent !== window) {
-    window.parent.postMessage({ type: 'guizang-studio:start', prompt }, location.origin)
+    window.parent.postMessage({ type: 'guizang-design:start', prompt }, location.origin)
     return
   }
   navigator.clipboard?.writeText(prompt).then(() => toast('草稿已复制，粘贴到对话里就能用'), () => toast('复制失败'))
 }
 addEventListener('message', (e) => {
-  if (e.origin === location.origin && e.data?.type === 'guizang-studio:start-failed') toast(`没能开新对话：${e.data.message}`)
+  if (e.origin === location.origin && e.data?.type === 'guizang-design:start-failed') toast(`没能开新对话：${e.data.message}`)
 })
 
 const date = (iso) => (iso ? new Date(iso).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('/', '.') : '')

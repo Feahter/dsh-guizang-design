@@ -1,5 +1,5 @@
 {
-  "name": "dsh-guizang-studio",
+  "name": "dsh-guizang-design",
   "version": "0.1.0",
   "description": "歸藏工作室 · DeepSeek Harness 插件：网页 PPT、图文卡片、网页排版、去 AI 味四个 skill，一套设计系统；展示库收着官方示例和你做过的作品，一键做同风格的下一份。",
   "type": "module",
@@ -36,10 +36,10 @@
     "typography"
   ],
   "author": "op7418",
-  "homepage": "https://github.com/op7418/dsh-guizang-studio",
+  "homepage": "https://github.com/op7418/dsh-guizang-design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/op7418/dsh-guizang-studio.git"
+    "url": "git+https://github.com/op7418/dsh-guizang-design.git"
   },
   "engines": {
     "node": "^22.19.0 || >=24.0.0",

@@ -6,26 +6,27 @@
 <title>歸藏设计</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Noto+Sans+SC:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200..700&family=Noto+Sans+SC:wght@200..700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="gz-swiss.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="appbar">
-  <div class="appbar-in">
-    <a class="brand" href="#/"><span class="brand-mark" aria-hidden="true"></span>歸藏设计<span class="badge">插件</span></a>
-    <nav class="tabs" aria-label="导航">
-      <a href="#/" data-view="home">概览</a>
-      <a href="#/works" data-view="works">我的作品</a>
-      <a href="#/workflows" data-view="workflows">内容生产工作流</a>
-      <a href="#/voice" data-view="voice">语气档案</a>
-      <a href="#/examples" data-view="examples">官方示例</a>
+<div class="shell">
+  <aside class="rail">
+    <a class="brand" href="#/"><span class="brand-mark" aria-hidden="true"></span><span>歸藏设计</span></a>
+    <nav class="nav" aria-label="导航">
+      <div class="nav-group">创作</div>
+      <a href="#/" data-view="home"><i data-icon="home"></i>概览</a>
+      <a href="#/works" data-view="works"><i data-icon="works"></i>我的作品<span class="nav-count" data-count="works"></span></a>
+      <a href="#/workflows" data-view="workflows"><i data-icon="flow"></i>内容生产工作流</a>
+      <div class="nav-group">资料</div>
+      <a href="#/voice" data-view="voice"><i data-icon="voice"></i>语气档案</a>
+      <a href="#/examples" data-view="examples"><i data-icon="book"></i>官方示例</a>
     </nav>
-    <span class="ver">dsh-guizang-design</span>
-  </div>
-</header>
-
-<main class="app" id="app"></main>
+    <div class="rail-foot" id="rail-foot"></div>
+  </aside>
+  <main class="main" id="app"></main>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="app.js"></script>
 </body>

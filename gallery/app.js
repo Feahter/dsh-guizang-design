@@ -97,7 +97,7 @@ function exampleTable(list) {
   </div>`
 }
 
-const emptyWorks = `<div class="empty">还没有作品。用上面任意一个 skill 做完一份，它会自己登记到这里；也可以手动登记：<br><br><code>node &lt;插件目录&gt;/scripts/library.mjs add &lt;HTML 文件或卡片任务目录&gt; --skill guizang-ppt-skill --title "标题"</code></div>`
+const emptyWorks = `<div class="empty">还没有作品。用上面任意一个 skill 做完一份，它会自己登记到这里。以前做的，可以在对话里说「把 &lt;文件路径&gt; 登记进歸藏设计的作品库」。</div>`
 
 const VOICE_DESC = '读你在 DeepSeek 里发过的消息（尤其是大段的文字），学出你自己的写作习惯：常用的词、不用的词、句子长短、标点和称呼。去 AI 味时保留你本来的说法；让 AI 仿写文案、讲稿、卡片标题时，照着你的语气写。只存在这台电脑上。'
 

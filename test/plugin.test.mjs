@@ -9,13 +9,14 @@ import { fileURLToPath } from 'node:url'
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const home = mkdtempSync(join(tmpdir(), 'gz-studio-'))
 process.env.DSH_HOME = home
-const { createSkillProvider } = await import('../lib/skills.js')
+const { createSkillProvider, readSkills, REWRITES } = await import('../lib/skills.js')
 const { addWork, listWorks, removeWork } = await import('../lib/library.js')
 const { RECIPES, SKILLS } = await import('../lib/recipes.js')
+const { libraryTool, voiceTool, TOOLS } = await import('../lib/tools.js')
 
 const provider = createSkillProvider([join(ROOT, 'skills'), join(ROOT, 'own-skills')], ROOT)
 
-test('四个 skill 和语料档案都注册了，名字合法', async () => {
+test('四个 skill 和语气档案都注册了，名字合法', async () => {
   const names = (await provider.list({})).map((c) => c.name).sort()
   assert.deepEqual(names, ['guizang-page-skill', 'guizang-ppt-skill', 'guizang-social-card-skill', 'guizang-voice', 'humanizer-zh'])
   for (const c of await provider.list({})) {
@@ -31,11 +32,27 @@ test('加载正文：<SKILL_ROOT> 换成实际目录，末尾附上插件说明'
   assert.ok(!d.content.includes('<SKILL_ROOT>'))
   assert.ok(d.content.includes(join(ROOT, 'skills', 'guizang-ppt-skill')))
   assert.match(d.content, /## 在歸藏设计插件（DSH）里使用/)
-  assert.match(d.content, /library\.mjs add/)
+  assert.match(d.content, /guizang_library_add/)
+  assert.match(d.content, /guizang_voice/)
+  assert.ok(!d.content.split('## 在歸藏设计插件（DSH）里使用')[1].includes('.mjs'), '附注里不再让模型跑脚本（沙箱写不了数据目录）')
   assert.match(d.content, /演讲回收/)
   const v = await provider.get((await provider.list({})).find((x) => x.name === 'guizang-voice'), {})
   assert.ok(!v.content.includes('<PLUGIN_ROOT>'))
   assert.ok(!v.content.includes('在歸藏设计插件（DSH）里使用'))
+  assert.ok(!/voice\.mjs|语料档案/.test(v.content))
+})
+
+test('只适用于 git clone 安装的步骤都换掉了：每条替换都命中，正文里不再有 git 命令', async () => {
+  const skills = readSkills([join(ROOT, 'skills')])
+  for (const [name, rules] of Object.entries(REWRITES)) {
+    const s = skills.find((x) => x.name === name)
+    assert.ok(s, name)
+    for (const [from] of rules) assert.match(s.body, from, `${name}：上游改了这一段，更新 REWRITES`)
+  }
+  for (const c of await provider.list({})) {
+    const d = await provider.get(c, {})
+    assert.ok(!/git -C|git fetch|git pull|rev-list/.test(d.content), c.name)
+  }
 })
 
 test('作品库：登记、重复登记只更新、卡片目录收图并选首图、移除', () => {
@@ -59,12 +76,55 @@ test('作品库：登记、重复登记只更新、卡片目录收图并选首�
   assert.equal(listWorks().length, 1)
 })
 
-test('语料档案：note 追加到「对话中学到的」', () => {
+test('语气档案：note 追加到「对话中学到的」，脚本和工具写的是同一份', async () => {
   const run = (...a) => execFileSync('node', [join(ROOT, 'scripts/voice.mjs'), ...a], { env: { ...process.env, DSH_HOME: home }, encoding: 'utf8' })
+  assert.match(run('show'), /还没有语气档案。这不是错误/)
   run('note', '第一条')
-  run('note', '第二条')
+  await voiceTool.execute({ action: 'note', text: '第二条' })
   const text = readFileSync(run('path').trim(), 'utf8')
+  assert.match(text, /^# 语气档案\n/)
   assert.match(text, /## 对话中学到的\n- \d{4}-\d{2}-\d{2}：第一条\n- \d{4}-\d{2}-\d{2}：第二条/)
+  assert.equal((await voiceTool.execute({ action: 'show' })).text, text)
+})
+
+test('guizang_voice：save 覆盖整份档案，参数不对时报错', async () => {
+  await voiceTool.execute({ action: 'save', text: '# 语气档案\n更新：2026-10-31\n\n## 节奏与结构\n- 短句多' })
+  assert.match((await voiceTool.execute({ action: 'show' })).text, /## 节奏与结构\n- 短句多\n$/)
+  await assert.rejects(voiceTool.execute({ action: 'save', text: '没有标题' }), /一级标题/)
+  await assert.rejects(voiceTool.execute({ action: 'note' }), /需要 text/)
+  await assert.rejects(voiceTool.execute({ action: 'delete' }), /action 只能是/)
+  await assert.rejects(voiceTool.execute({ action: 'show', path: '/x' }), /未知参数 path/)
+})
+
+test('guizang_library_add：登记作品，要求绝对路径和已知的 skill', async () => {
+  const dir = join(home, 'task-tool')
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(join(dir, 'index.html'), '<h1>x</h1>')
+  const v = await libraryTool.execute({ path: join(dir, 'index.html'), skill: 'guizang-ppt-skill', title: '工具登记', column: '周记' })
+  const w = listWorks().find((x) => x.id === v.id)
+  assert.equal(w.title, '工具登记')
+  assert.equal(w.column, '周记')
+  assert.match(libraryTool.output.render({}, v)[0].text, /已登记：工具登记/)
+  await assert.rejects(libraryTool.execute({ path: 'index.html', skill: 'guizang-ppt-skill', title: 'x' }), /绝对路径/)
+  await assert.rejects(libraryTool.execute({ path: join(dir, 'index.html'), skill: 'humanizer-zh', title: 'x' }), /skill 只能是/)
+  await assert.rejects(libraryTool.execute({ path: join(dir, 'index.html'), skill: 'guizang-ppt-skill' }), /缺少 title/)
+})
+
+test('工具定义符合 DSH 工具注册表的要求', () => {
+  const walk = (n, at) => {
+    assert.equal(typeof n.type, 'string', at)
+    if (n.type === 'object') {
+      assert.equal(typeof n.additionalProperties, 'boolean', `${at}.additionalProperties 要写明`)
+      for (const k of n.required || []) assert.ok(n.properties[k], `${at}.required ${k}`)
+      for (const [k, p] of Object.entries(n.properties)) walk(p, `${at}.${k}`)
+    }
+  }
+  for (const t of TOOLS) {
+    assert.match(t.name, /^[a-z][a-z0-9_]*$/)
+    assert.equal(typeof t.output.render, 'function')
+    walk(t.parameters, `${t.name}.parameters`)
+    walk(t.output.schema, `${t.name}.output`)
+  }
 })
 
 test('工作流和 skill 草稿都以 /skill 名开头，并且引用的 skill 都存在', async () => {

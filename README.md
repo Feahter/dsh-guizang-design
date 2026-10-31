@@ -113,15 +113,27 @@ dsh plugin --profile web remove dsh-guizang-design              # 卸载
 
 - 侧栏点「歸藏设计」打开插件页面；点 skill 卡片、「使用工作流」「做同款」「做新一期」都会开一个新对话并填好草稿。
 - 在输入框里直接用命令，比如 `/guizang-page-skill 把这篇文章排成网页`。
-- 作品一般会自动登记。需要手动登记时：
+- 作品交付时会自动登记进作品库。以前做的作品，在对话里说「把 <文件路径> 登记进歸藏设计的作品库」就行。
 
-  ```bash
-  node <插件目录>/scripts/library.mjs add <HTML 文件或卡片任务目录> --skill guizang-ppt-skill --title "标题" [--column "专栏名"]
-  node <插件目录>/scripts/library.mjs list
-  node <插件目录>/scripts/library.mjs remove <id>
-  ```
+### 插件给模型的两个工具
 
-  卡片给任务目录（会收 `output/` 里的图），PPT 和网页给 HTML 文件。同一个文件重复登记只会更新。加 `--column` 的作品会按专栏归组。
+作品库和语气档案放在工作区外（见下面的「数据和隐私」），模型在沙箱里跑的命令写不进去，所以插件注册了两个工具，由 dsh 主进程执行：
+
+| 工具 | 做什么 |
+|---|---|
+| `guizang_library_add` | 把交付的作品登记进作品库：PPT 和网页给 HTML 文件，卡片给任务目录（会收 `output/` 里的图）；同一个文件重复登记只会更新 |
+| `guizang_voice` | 读写语气档案：读、追加一条对话里学到的、整份保存、整理聊天记录素材 |
+
+它们只读写 `guizang-design/` 这一个目录。
+
+在终端里也可以手动处理：
+
+```bash
+node <插件目录>/scripts/library.mjs add <HTML 文件或卡片任务目录> --skill guizang-ppt-skill --title "标题" [--column "专栏名"]
+node <插件目录>/scripts/library.mjs list
+node <插件目录>/scripts/library.mjs remove <id>
+node <插件目录>/scripts/voice.mjs show
+```
 
 ## 数据和隐私
 
@@ -145,14 +157,14 @@ dsh plugin --profile web remove dsh-guizang-design              # 卸载
 - [guizang-pages-skill](https://github.com/op7418/guizang-pages-skill)
 - [Humanizer-zh](https://github.com/op7418/Humanizer-zh)
 
-插件里的 `skills/` 是这些仓库在固定提交上的快照，版本记在 [`skills/manifest.json`](skills/manifest.json)，插件页面左下角也会显示。加载时插件会在 skill 末尾补几条插件环境下的说明（依赖已装好、交付后登记作品、写文案前读语气档案）。
+插件里的 `skills/` 是这些仓库在固定提交上的快照，版本记在 [`skills/manifest.json`](skills/manifest.json)，插件页面左下角也会显示。加载时插件会做两处调整：去掉只适用于 git clone 安装的步骤（PPT skill 开头的「检查更新」，插件里的 skill 随插件版本更新）；在末尾补几条插件环境下的说明（依赖已装好、交付后登记作品、写文案前读语气档案）。
 
 你在 `~/.dsh/skills` 或项目的 `.dsh/skills` 里装了同名 skill 时，那一份优先，插件自带的这份让位。
 
 ## 常见问题
 
 **插件页面里的作品是空的？**
-作品要在装了插件之后做出来才会自动登记。之前做过的可以用 `library.mjs add` 手动登记。
+作品要在装了插件之后做出来才会自动登记。之前做过的，在对话里说「把 <文件路径> 登记进歸藏设计的作品库」。
 
 **语气档案提示「还没找到成段的消息」？**
 插件只取 30 字以上、你亲手发的消息。对话少的时候先用「用我写过的文章补充」。
@@ -175,12 +187,12 @@ dsh plugin --profile web add link:$PWD   # 本地调试
 
 | 目录 | 说明 |
 |---|---|
-| `lib/` | 插件本体：`index.js`（Host 半边：skill 提供方、页面和接口）、`client.js`（浏览器半边：侧栏入口、开新对话） |
+| `lib/` | 插件本体：`index.js`（Host 半边：skill 提供方、工具、页面和接口）、`tools.js`（给模型的两个工具）、`client.js`（浏览器半边：侧栏入口、开新对话） |
 | `gallery/` | 插件页面。`gz-swiss.css` 由设计系统生成，不要手改 |
 | `skills/` | 独立仓库的快照，用 `node tools/vendor-skills.mjs` 更新，不要直接改 |
 | `own-skills/` | 插件自己的 skill（语气档案） |
 | `examples/` | 官方示例，用 `node tools/vendor-examples.mjs` 生成 |
-| `scripts/` | `library.mjs`（作品库）、`voice.mjs`（语气档案） |
+| `scripts/` | `library.mjs`（作品库）、`voice.mjs`（语气档案）的命令行版本，手动处理用 |
 
 ## License
 

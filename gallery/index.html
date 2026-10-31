@@ -29,6 +29,14 @@
   <main class="main" id="app"></main>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="viewer-title" hidden>
+  <div class="viewer-bar">
+    <span class="viewer-title" id="viewer-title"></span>
+    <button class="ibtn" data-viewer="full" title="全屏" aria-label="全屏"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <button class="ibtn" data-viewer="close" title="关闭（Esc）" aria-label="关闭"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="viewer-body"></div>
+</div>
 <script src="app.js"></script>
 </body>
 </html>

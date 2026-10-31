@@ -65,7 +65,7 @@ function thumb(w) {
 function workCard(w) {
   const kicker = [skillTag(w.skill), w.files?.length > 1 ? `<span>${w.files.length} 张</span>` : '', w.column ? `<span>${esc(w.column)}</span>` : ''].filter(Boolean).join('<span class="sep">·</span>')
   return `<article class="work">
-    ${w.missing ? `<div class="work-open">${thumb(w)}</div>` : `<a class="work-open" href="${esc(w.url)}" target="_blank" rel="noopener" title="打开作品">${thumb(w)}</a>`}
+    ${w.missing ? `<div class="work-open">${thumb(w)}</div>` : `<a class="work-open" href="${esc(w.url)}" target="_blank" rel="noopener" data-open="${esc(w.id)}" title="打开作品">${thumb(w)}</a>`}
     <div class="work-body">
       <div class="work-kicker mono">${kicker}</div>
       <div class="work-title">${esc(w.title)}</div>
@@ -92,7 +92,7 @@ function exampleTable(list) {
   return `<div class="table">
     ${list.map((w) => `<div class="row">
       <div><div class="r-title">${esc(w.title)}<span class="r-skill">${skillTag(w.skill)}</span></div><div class="r-sub">${esc(w.summary || '')}</div></div>
-      <div class="r-act"><a class="btn ghost" href="${esc(w.url)}" target="_blank" rel="noopener">打开</a><button class="btn" data-next="${esc(w.id)}">做同款</button></div>
+      <div class="r-act"><a class="btn ghost" href="${esc(w.url)}" target="_blank" rel="noopener" data-open="${esc(w.id)}">打开</a><button class="btn" data-next="${esc(w.id)}">做同款</button></div>
     </div>`).join('')}
   </div>`
 }
@@ -284,9 +284,42 @@ function blobArt(banner, seed) {
 }
 function mountBlobs() { document.querySelectorAll('.banner').forEach((b, i) => blobArt(b, i + 1)) }
 
+// ---------- 查看作品 ----------
+// 在页面里打开，不开新窗口：桌面版里 iframe 的新窗口链接会交给系统浏览器，那边没有 dsh 的登录，打不开。
+// 原链接留着，中键 / Cmd+点击仍然在新标签页打开（网页版）
+const viewer = document.getElementById('viewer')
+function openViewer(w) {
+  viewer.querySelector('.viewer-title').textContent = w.title
+  const body = viewer.querySelector('.viewer-body')
+  body.className = `viewer-body ${w.kind === 'image' ? 'images' : 'page'}`
+  body.innerHTML = w.kind === 'image'
+    ? (w.files?.length ? w.files : [w.url]).map((f) => `<img src="${esc(f)}" alt="">`).join('')
+    : `<iframe src="${esc(w.url)}" title="${esc(w.title)}" allow="fullscreen"></iframe>`
+  viewer.hidden = false
+  const frame = body.querySelector('iframe')
+  // PPT 要键盘翻页，载入后把焦点交给作品
+  if (frame) frame.addEventListener('load', () => frame.focus(), { once: true })
+  else viewer.querySelector('[data-viewer="close"]').focus()
+}
+function closeViewer() {
+  if (document.fullscreenElement) document.exitFullscreen()
+  viewer.hidden = true
+  viewer.querySelector('.viewer-body').innerHTML = ''
+}
+viewer.querySelector('[data-viewer="full"]').hidden = !document.fullscreenEnabled
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && !viewer.hidden && !document.fullscreenElement) closeViewer() })
+
 // ---------- 交互 ----------
 document.addEventListener('click', async (e) => {
+  const a = e.target.closest('a[data-open]')
+  if (a && data && e.button === 0 && !(e.metaKey || e.ctrlKey || e.shiftKey)) {
+    e.preventDefault()
+    openViewer([...data.works, ...data.examples].find((w) => w.id === a.dataset.open))
+    return
+  }
   const b = e.target.closest('button')
+  if (b?.dataset.viewer === 'close') return closeViewer()
+  if (b?.dataset.viewer === 'full') return viewer.requestFullscreen().catch(() => toast('这个窗口不允许全屏'))
   if (!b || !data) return
   if (b.dataset.starter) start(data.skills.find((s) => s.name === b.dataset.starter).starter)
   else if (b.dataset.recipe) start(data.recipes.find((r) => r.id === b.dataset.recipe).prompt)

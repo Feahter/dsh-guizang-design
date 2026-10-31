@@ -179,6 +179,16 @@ svg.ic { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 10px); opacity: 0; pointer-events: none; padding: 10px 16px; background: var(--ink); color: var(--paper); font-size: 13px; transition: opacity .2s, transform .2s; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* 查看作品：页面内铺满的查看层（PPT / 网页用 iframe，卡片按顺序排图） */
+.viewer { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; background: var(--grey-1); }
+.viewer[hidden] { display: none; }
+.viewer-bar { display: flex; align-items: center; gap: var(--sp-2); height: 48px; padding: 0 var(--sp-3) 0 var(--sp-5); background: var(--paper); border-bottom: 1px solid var(--line-subtle); }
+.viewer-title { margin-right: auto; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.viewer-body { flex: 1; min-height: 0; }
+.viewer-body.page iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+.viewer-body.images { overflow: auto; display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: var(--sp-5); padding: var(--sp-6); }
+.viewer-body.images img { display: block; max-width: min(100%, 540px); height: auto; box-shadow: 0 1px 0 var(--line), 0 8px 24px -12px rgba(0,0,0,.35); }
+
 @media (max-width: 1100px) {
   .banners { grid-template-columns: 1fr; }
   .flows { grid-template-columns: repeat(2, minmax(0, 1fr)); }

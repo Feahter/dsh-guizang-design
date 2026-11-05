@@ -4,9 +4,11 @@
 
 A [DeepSeek Harness](https://www.npmjs.com/package/@deepseek-ai/dsh) (dsh) plugin that installs Guizang's content skills — web slide decks, social cards, typeset web pages and Chinese de-AI editing — plus a writing-voice profile. The first three share one design system, so a deck, a card set and a web page made from the same content use the same themes, fonts and layout language.
 
-It also adds a **歸藏设计** page to the sidebar: start a skill, browse what you have made, make another one in the same style, or run a multi-skill workflow.
+It also adds a **Guizang Design** page to the sidebar: start a skill, browse what you have made, make another one in the same style, or run a multi-skill workflow.
 
 ![Plugin page](screenshots/1-studio.jpg)
+
+**Follows the client language**: switch DSH to English in Settings and the page, workflow drafts and official examples all change to English without a reload.
 
 ## What you get
 

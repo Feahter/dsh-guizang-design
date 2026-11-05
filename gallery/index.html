@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>歸藏设计</title>
 <script src="scheme.js"></script>
+<script src="i18n.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200..700&family=Noto+Sans+SC:wght@200..700&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -14,15 +15,15 @@
 <body>
 <div class="shell">
   <aside class="rail">
-    <a class="brand" href="#/"><img class="brand-logo" src="avatar.jpg" alt=""><span><span class="brand-name">歸藏设计</span><span class="brand-sub">dsh-guizang-design</span></span></a>
-    <nav class="nav" aria-label="导航">
-      <div class="nav-group">创作</div>
-      <a href="#/" data-view="home"><i data-icon="home"></i>概览</a>
-      <a href="#/works" data-view="works"><i data-icon="works"></i>我的作品<span class="nav-count" data-count="works"></span></a>
-      <a href="#/workflows" data-view="workflows"><i data-icon="flow"></i>内容生产工作流</a>
-      <div class="nav-group">资料</div>
-      <a href="#/voice" data-view="voice"><i data-icon="voice"></i>语气档案</a>
-      <a href="#/examples" data-view="examples"><i data-icon="book"></i>官方示例</a>
+    <a class="brand" href="#/"><img class="brand-logo" src="avatar.jpg" alt=""><span><span class="brand-name" data-i18n="brand.name">歸藏设计</span><span class="brand-sub">dsh-guizang-design</span></span></a>
+    <nav class="nav" data-i18n-label="nav.label" aria-label="导航">
+      <div class="nav-group" data-i18n="nav.create">创作</div>
+      <a href="#/" data-view="home"><i data-icon="home"></i><span data-i18n="nav.home">概览</span></a>
+      <a href="#/works" data-view="works"><i data-icon="works"></i><span data-i18n="nav.works">我的作品</span><span class="nav-count" data-count="works"></span></a>
+      <a href="#/workflows" data-view="workflows"><i data-icon="flow"></i><span data-i18n="nav.workflows">内容生产工作流</span></a>
+      <div class="nav-group" data-i18n="nav.library">资料</div>
+      <a href="#/voice" data-view="voice"><i data-icon="voice"></i><span data-i18n="nav.voice">语气档案</span></a>
+      <a href="#/examples" data-view="examples"><i data-icon="book"></i><span data-i18n="nav.examples">官方示例</span></a>
     </nav>
     <div class="rail-foot" id="rail-foot"></div>
   </aside>
@@ -32,8 +33,8 @@
 <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="viewer-title" hidden>
   <div class="viewer-bar">
     <span class="viewer-title" id="viewer-title"></span>
-    <button class="ibtn" data-viewer="full" title="全屏" aria-label="全屏"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-    <button class="ibtn" data-viewer="close" title="关闭（Esc）" aria-label="关闭"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <button class="ibtn" data-viewer="full" data-i18n-title="viewer.full" title="全屏" aria-label="全屏"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <button class="ibtn" data-viewer="close" data-i18n-title="viewer.close" title="关闭（Esc）" aria-label="关闭"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
   <div class="viewer-body"></div>
 </div>

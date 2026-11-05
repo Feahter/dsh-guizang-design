@@ -1,6 +1,8 @@
 // 歸藏设计 · 插件页面。读 /guizang-design/api/catalog，按 #/路由 渲染：概览、我的作品、内容生产工作流、语气档案、官方示例。
 // 按钮把草稿交给外层（插件浏览器半边开新对话并填好输入框）；单独打开页面时复制草稿。
 const $ = (s, el = document) => el.querySelector(s)
+const i18n = window.GZ_I18N
+const t = i18n.t
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
 // 细线图标（24 网格，1.5 线宽，直角端点）
@@ -19,13 +21,13 @@ const icon = (n) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC
 
 // 每个 skill 对应一个瑞士风主题（横幅动画区的底色），作品上的小色块也用它
 const META = {
-  'guizang-ppt-skill': { short: 'PPT', theme: 'ikb', dot: '#002FA7' },
-  'guizang-social-card-skill': { short: '卡片', theme: 'safety-orange', dot: '#FF6B35' },
-  'guizang-page-skill': { short: '网页', theme: 'lemon-green', dot: '#C5E803' },
-  'humanizer-zh': { short: '去 AI 味', theme: 'lemon', dot: '#FFD500' },
-  'guizang-voice': { short: '语气', theme: 'ikb', dot: '#737373' },
+  'guizang-ppt-skill': { key: 'skill.ppt', theme: 'ikb', dot: '#002FA7' },
+  'guizang-social-card-skill': { key: 'skill.card', theme: 'safety-orange', dot: '#FF6B35' },
+  'guizang-page-skill': { key: 'skill.page', theme: 'lemon-green', dot: '#C5E803' },
+  'humanizer-zh': { key: 'skill.humanizer', theme: 'lemon', dot: '#FFD500' },
+  'guizang-voice': { key: 'skill.voice', theme: 'ikb', dot: '#737373' },
 }
-const meta = (n) => META[n] || { short: n || '其他', dot: '#a3a3a3' }
+const meta = (n) => (META[n] ? { ...META[n], short: t(META[n].key) } : { short: n || t('skill.other'), dot: '#a3a3a3' })
 const skillTag = (n) => `<span><i class="dot" style="--dot:${meta(n).dot}"></i>${esc(meta(n).short)}</span>`
 const date = (iso) => (iso ? new Date(iso).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('/', '.') : '')
 
@@ -41,18 +43,20 @@ function toast(text) {
 }
 function start(prompt) {
   if (window.parent !== window) return window.parent.postMessage({ type: 'guizang-design:start', prompt }, location.origin)
-  navigator.clipboard?.writeText(prompt).then(() => toast('草稿已复制，粘贴到对话里就能用'), () => toast('复制失败'))
+  navigator.clipboard?.writeText(prompt).then(() => toast(t('draft.copied')), () => toast(t('draft.copyFailed')))
 }
 addEventListener('message', (e) => {
-  if (e.origin === location.origin && e.data?.type === 'guizang-design:start-failed') toast(`没能开新对话：${e.data.message}`)
+  if (e.origin === location.origin && e.data?.type === 'guizang-design:start-failed') toast(t('draft.startFailed', e.data.message))
+  // 客户端切换语言：文案立刻换，目录按新语言重新取（工作流和示例的标题、草稿都在目录里）
+  if (e.source === parent && e.origin === location.origin && e.data?.type === 'guizang-design:locale' && i18n.set(e.data.lang)) load()
 })
 
 // ---------- 组件 ----------
 const head = (eyebrow, title, desc) => `<header class="head"><span class="eyebrow">${esc(eyebrow)}</span><h1>${esc(title)}</h1>${desc ? `<p>${esc(desc)}</p>` : ''}</header>`
-const secHead = (num, title, more) => `<div class="sec-head"><span class="num">${num}</span><h2>${esc(title)}</h2>${more ? `<a class="more" href="${more}">查看全部${icon('right')}</a>` : ''}</div>`
+const secHead = (num, title, more) => `<div class="sec-head"><span class="num">${num}</span><h2>${esc(title)}</h2>${more ? `<a class="more" href="${more}">${t('more')}${icon('right')}</a>` : ''}</div>`
 
 function thumb(w) {
-  if (w.missing) return '<div class="thumb missing">文件已不在原位置</div>'
+  if (w.missing) return `<div class="thumb missing">${t('work.missing')}</div>`
   if (w.thumb) return `<div class="thumb"><img src="${esc(w.thumb)}" alt="" loading="lazy"></div>`
   if (w.kind === 'image') {
     const imgs = (w.files?.length ? w.files : [w.url]).slice(0, 3)
@@ -63,28 +67,28 @@ function thumb(w) {
 
 // 点卡片 = 打开作品；「做同款」= 在新对话里按这份作品的主题和版式做一份新内容；垃圾桶 = 移出作品库（不删文件）
 function workCard(w) {
-  const kicker = [skillTag(w.skill), w.files?.length > 1 ? `<span>${w.files.length} 张</span>` : '', w.column ? `<span>${esc(w.column)}</span>` : ''].filter(Boolean).join('<span class="sep">·</span>')
+  const kicker = [skillTag(w.skill), w.files?.length > 1 ? `<span>${t('work.count', w.files.length)}</span>` : '', w.column ? `<span>${esc(w.column)}</span>` : ''].filter(Boolean).join('<span class="sep">·</span>')
   return `<article class="work">
-    ${w.missing ? `<div class="work-open">${thumb(w)}</div>` : `<a class="work-open" href="${esc(w.url)}" target="_blank" rel="noopener" data-open="${esc(w.id)}" title="打开作品">${thumb(w)}</a>`}
+    ${w.missing ? `<div class="work-open">${thumb(w)}</div>` : `<a class="work-open" href="${esc(w.url)}" target="_blank" rel="noopener" data-open="${esc(w.id)}" title="${esc(t('work.open'))}">${thumb(w)}</a>`}
     <div class="work-body">
       <div class="work-kicker mono">${kicker}</div>
       <div class="work-title">${esc(w.title)}</div>
-      ${w.theme ? `<div class="work-tags">主题 ${esc(w.theme)}</div>` : ''}
+      ${w.theme ? `<div class="work-tags">${esc(t('work.theme', w.theme))}</div>` : ''}
     </div>
     <div class="work-foot">
       <span class="date">${date(w.updatedAt)}</span>
-      <button class="btn" data-next="${esc(w.id)}" title="用这份作品的主题和版式，在新对话里做一份新内容">做同款</button>
-      <button class="ibtn" data-remove="${esc(w.id)}" title="移出作品库（不删除文件）" aria-label="移出作品库">${icon('trash')}</button>
+      <button class="btn" data-next="${esc(w.id)}" title="${esc(t('work.nextTip'))}">${t('work.next')}</button>
+      <button class="ibtn" data-remove="${esc(w.id)}" title="${esc(t('work.remove'))}" aria-label="${esc(t('work.removeLabel'))}">${icon('trash')}</button>
     </div>
   </article>`
 }
 
 function flowCard(r, i) {
   return `<article class="flow">
-    <span class="mono">工作流 ${String(i + 1).padStart(2, '0')}</span>
+    <span class="mono">${t('flow.kicker', String(i + 1).padStart(2, '0'))}</span>
     <h3>${esc(r.title)}</h3>
     <div class="steps">${r.steps.map(skillTag).join('<span class="arrow">→</span>')}</div>
-    <button class="btn" data-recipe="${esc(r.id)}">使用工作流</button>
+    <button class="btn" data-recipe="${esc(r.id)}">${t('flow.use')}</button>
   </article>`
 }
 
@@ -92,14 +96,12 @@ function exampleTable(list) {
   return `<div class="table">
     ${list.map((w) => `<div class="row">
       <div><div class="r-title">${esc(w.title)}<span class="r-skill">${skillTag(w.skill)}</span></div><div class="r-sub">${esc(w.summary || '')}</div></div>
-      <div class="r-act"><a class="btn ghost" href="${esc(w.url)}" target="_blank" rel="noopener" data-open="${esc(w.id)}">打开</a><button class="btn" data-next="${esc(w.id)}">做同款</button></div>
+      <div class="r-act"><a class="btn ghost" href="${esc(w.url)}" target="_blank" rel="noopener" data-open="${esc(w.id)}">${t('open')}</a><button class="btn" data-next="${esc(w.id)}">${t('work.next')}</button></div>
     </div>`).join('')}
   </div>`
 }
 
-const emptyWorks = `<div class="empty">还没有作品。用上面任意一个 skill 做完一份，它会自己登记到这里。以前做的，可以在对话里说「把 &lt;文件路径&gt; 登记进歸藏设计的作品库」。</div>`
-
-const VOICE_DESC = '读你在 DeepSeek 里发过的消息（尤其是大段的文字），学出你自己的写作习惯：常用的词、不用的词、句子长短、标点和称呼。去 AI 味时保留你本来的说法；让 AI 仿写文案、讲稿、卡片标题时，照着你的语气写。只存在这台电脑上。'
+const emptyWorks = () => `<div class="empty">${t('works.empty')}</div>`
 
 // 档案是 Markdown：只渲染标题、列表和段落
 function md(text) {
@@ -120,74 +122,74 @@ function md(text) {
 function voicePanel(full) {
   const v = data.voice
   const side = `<div class="panel">
-    <span class="mono">档案状态</span>
-    <div class="state ${v.exists ? 'ok' : ''}"><i></i>${v.exists ? '已建档' : '还没有档案'}</div>
+    <span class="mono">${t('voice.status')}</span>
+    <div class="state ${v.exists ? 'ok' : ''}"><i></i>${t(v.exists ? 'voice.exists' : 'voice.none')}</div>
     ${v.exists && v.updated ? `<p>${esc(v.updated)}</p>` : ''}
     <div class="actions">
-      <button class="btn" data-voice-history>${v.exists ? '重新学习我的对话' : '从我的 DeepSeek 对话学习'}</button>
-      <button class="btn ghost" data-voice="articles">用我写过的文章补充</button>
+      <button class="btn" data-voice-history>${t(v.exists ? 'voice.relearn' : 'voice.learn')}</button>
+      <button class="btn ghost" data-voice="articles">${t('voice.articles')}</button>
     </div>
     <div class="path">${esc(v.path)}</div>
   </div>`
   const main = v.exists
     ? `<div class="panel profile">${md(full ? v.text : v.text.split('\n').slice(0, 14).join('\n'))}</div>`
-    : `<div class="panel"><span class="mono">怎么学</span><h3>三步建好你的语气档案</h3><ol>
-        <li>点「从我的 DeepSeek 对话学习」：插件把你在 DeepSeek 里发过的消息整理好，开一个新对话交给 AI。</li>
-        <li>AI 逐条提炼你的写作习惯，每条都附原文出处，学完给你过目，哪条不对就改哪条。</li>
-        <li>之后你在对话里纠正措辞（「别用这个词」「我一般这么说」），它会自己记下来。</li></ol></div>`
+    : `<div class="panel"><span class="mono">${t('voice.howKicker')}</span><h3>${t('voice.howTitle')}</h3><ol>
+        <li>${t('voice.how1')}</li>
+        <li>${t('voice.how2')}</li>
+        <li>${t('voice.how3')}</li></ol></div>`
   return `<div class="voice">${main}${side}</div>`
 }
 
 function pills(key, list) {
   const skills = [...new Set(list.map((w) => w.skill).filter(Boolean))]
   const n = (s) => (s === 'all' ? list.length : list.filter((w) => w.skill === s).length)
-  return `<div class="pills">${['all', ...skills].map((s) => `<button class="pill" data-seg="${key}" data-skill="${s}" aria-pressed="${state[key] === s}">${s === 'all' ? '全部' : esc(meta(s).short)} (${n(s)})</button>`).join('')}</div>`
+  return `<div class="pills">${['all', ...skills].map((s) => `<button class="pill" data-seg="${key}" data-skill="${s}" aria-pressed="${state[key] === s}">${s === 'all' ? t('pills.all') : esc(meta(s).short)} (${n(s)})</button>`).join('')}</div>`
 }
 
 // ---------- 视图 ----------
 const VIEWS = {
   home() {
     const { skills, works, recipes, examples, columns, voice } = data
-    return `${head('歸藏设计 · 插件', '用一套设计做所有内容', 'PPT、图文卡片、网页排版、去 AI 味，共用同一套瑞士风 / 杂志风设计系统。做过的作品都在这里，点「做同款」就能接着做下一份。')}
+    return `${head(t('home.eyebrow'), t('home.title'), t('home.desc'))}
       <div class="stats">
-        <div class="stat"><span class="mono">作品</span><div class="val">${works.length}</div><div class="sub">已登记</div></div>
-        <div class="stat"><span class="mono">专栏</span><div class="val">${columns.length}</div><div class="sub">${columns.reduce((n, c) => n + c.issues, 0)} 期</div></div>
-        <div class="stat"><span class="mono">工作流</span><div class="val">${recipes.length}</div><div class="sub">跨 skill 组合</div></div>
-        <div class="stat"><span class="mono">语气档案</span><div class="val">${voice.exists ? '已建' : '未建'}</div><div class="sub">${voice.exists ? esc(voice.updated || '') : '从对话里学'}</div></div>
+        <div class="stat"><span class="mono">${t('stat.works')}</span><div class="val">${works.length}</div><div class="sub">${t('stat.worksSub')}</div></div>
+        <div class="stat"><span class="mono">${t('stat.columns')}</span><div class="val">${columns.length}</div><div class="sub">${t('stat.columnsSub', columns.reduce((n, c) => n + c.issues, 0))}</div></div>
+        <div class="stat"><span class="mono">${t('stat.flows')}</span><div class="val">${recipes.length}</div><div class="sub">${t('stat.flowsSub')}</div></div>
+        <div class="stat"><span class="mono">${t('stat.voice')}</span><div class="val">${t(voice.exists ? 'stat.voiceYes' : 'stat.voiceNo')}</div><div class="sub">${voice.exists ? esc(voice.updated || '') : t('stat.voiceSub')}</div></div>
       </div>
-      <section>${secHead('01', '开始创作')}
+      <section>${secHead('01', t('sec.start'))}
         <div class="banners">${skills.map((s) => `
           <button class="banner" data-starter="${esc(s.name)}" data-theme="${meta(s.name).theme}">
             <span class="b-text"><span class="b-title">${esc(s.title)}</span><span class="b-desc">${esc(s.blurb)}</span><span class="b-cmd">/${esc(s.name)}</span></span>
             <span class="b-art"><canvas aria-hidden="true"></canvas><span class="b-go">${icon('arrow')}</span></span>
           </button>`).join('')}</div>
       </section>
-      <section class="sec">${secHead('02', '最近作品', works.length > 6 ? '#/works' : null)}
-        ${works.length ? `<div class="grid">${works.slice(0, 6).map(workCard).join('')}</div>` : emptyWorks}
+      <section class="sec">${secHead('02', t('sec.recent'), works.length > 6 ? '#/works' : null)}
+        ${works.length ? `<div class="grid">${works.slice(0, 6).map(workCard).join('')}</div>` : emptyWorks()}
       </section>
-      <section class="sec">${secHead('03', '内容生产工作流', '#/workflows')}<div class="flows">${recipes.slice(0, 3).map(flowCard).join('')}</div></section>
-      <section class="sec">${secHead('04', '语气档案', '#/voice')}${voicePanel(false)}</section>
-      <section class="sec">${secHead('05', '官方示例', '#/examples')}${exampleTable(examples.slice(0, 4))}</section>`
+      <section class="sec">${secHead('03', t('sec.flows'), '#/workflows')}<div class="flows">${recipes.slice(0, 3).map(flowCard).join('')}</div></section>
+      <section class="sec">${secHead('04', t('sec.voice'), '#/voice')}${voicePanel(false)}</section>
+      <section class="sec">${secHead('05', t('sec.examples'), '#/examples')}${exampleTable(examples.slice(0, 4))}</section>`
   },
   works() {
     const { works, columns } = data
     const shown = works.filter((w) => (state.skill === 'all' || w.skill === state.skill) && (!state.q || `${w.title} ${w.column} ${w.theme}`.toLowerCase().includes(state.q.toLowerCase())))
-    return `${head('我的作品', '我的作品', '点卡片打开作品；「做同款」在新对话里按这份作品的主题和版式做一份新内容。连载按专栏归在一起。')}
-      ${columns.length ? `${secHead('专栏', '连载')}<div class="columns">${columns.map((c) => `
-        <div class="column"><div class="c-body"><span class="mono">${c.issues} 期 · ${date(c.latest.updatedAt)}</span><div class="c-name">${esc(c.name)}</div><div class="c-meta">最近：${esc(c.latest.title)}</div></div>
-        <button class="btn" data-column="${esc(c.name)}">做新一期</button></div>`).join('')}</div>` : ''}
-      <div class="toolbar"><label class="search">${icon('search')}<input id="q" type="search" placeholder="搜索标题、专栏、主题" value="${esc(state.q)}"></label>${pills('skill', works)}</div>
-      ${works.length ? (shown.length ? `<div class="grid">${shown.map(workCard).join('')}</div>` : '<div class="empty">没有符合条件的作品</div>') : emptyWorks}`
+    return `${head(t('works.eyebrow'), t('works.title'), t('works.desc'))}
+      ${columns.length ? `${secHead(t('works.sec'), t('works.series'))}<div class="columns">${columns.map((c) => `
+        <div class="column"><div class="c-body"><span class="mono">${t('works.issues', c.issues, date(c.latest.updatedAt))}</span><div class="c-name">${esc(c.name)}</div><div class="c-meta">${esc(t('works.latest', c.latest.title))}</div></div>
+        <button class="btn" data-column="${esc(c.name)}">${t('works.newIssue')}</button></div>`).join('')}</div>` : ''}
+      <div class="toolbar"><label class="search">${icon('search')}<input id="q" type="search" placeholder="${esc(t('works.search'))}" value="${esc(state.q)}"></label>${pills('skill', works)}</div>
+      ${works.length ? (shown.length ? `<div class="grid">${shown.map(workCard).join('')}</div>` : `<div class="empty">${t('works.noMatch')}</div>`) : emptyWorks()}`
   },
   workflows() {
-    return `${head('内容生产工作流', '内容生产工作流')}<div class="flows">${data.recipes.map(flowCard).join('')}</div>`
+    return `${head(t('flows.title'), t('flows.title'))}<div class="flows">${data.recipes.map(flowCard).join('')}</div>`
   },
   voice() {
-    return `${head('语气档案', '语气档案', VOICE_DESC)}${voicePanel(true)}`
+    return `${head(t('voice.title'), t('voice.title'), t('voice.desc'))}${voicePanel(true)}`
   },
   examples() {
     const shown = data.examples.filter((w) => state.exSkill === 'all' || w.skill === state.exSkill)
-    return `${head('官方示例', '官方示例', '「做同款」在新对话里按这份示例的主题和版式，做一份你的内容。')}
+    return `${head(t('examples.title'), t('examples.title'), t('examples.desc'))}
       <div class="toolbar">${pills('exSkill', data.examples)}</div>${exampleTable(shown)}`
   },
 }
@@ -199,7 +201,7 @@ function render() {
   document.querySelectorAll('.nav a').forEach((a) => a.classList.toggle('on', a.dataset.view === view))
   document.querySelectorAll('[data-count="works"]').forEach((el) => (el.textContent = data.works.length || ''))
   // 左下角：插件版本和打包进来的各 skill 的提交
-  $('#rail-foot').innerHTML = `<div class="v-head">插件 v${esc(data.version || '')}</div>${data.skills.map((s) => `<div class="v-row" title="${esc(s.name)}"><span>${esc(meta(s.name).short)}</span><span>${esc(s.source?.commit?.slice(0, 7) || '—')}</span></div>`).join('')}`
+  $('#rail-foot').innerHTML = `<div class="v-head">${esc(t('rail.plugin', data.version || ''))}</div>${data.skills.map((s) => `<div class="v-row" title="${esc(s.name)}"><span>${esc(meta(s.name).short)}</span><span>${esc(s.source?.commit?.slice(0, 7) || '—')}</span></div>`).join('')}`
   const keepFocus = document.activeElement?.id === 'q'
   $('#app').innerHTML = VIEWS[view]()
   if (keepFocus) { const q = $('#q'); q.focus(); q.setSelectionRange(q.value.length, q.value.length) }
@@ -207,6 +209,8 @@ function render() {
   mountBlobs()
 }
 document.querySelectorAll('[data-icon]').forEach((el) => (el.outerHTML = icon(el.dataset.icon)))
+// i18n.js 在 <head> 里跑的时候静态文案还不在 DOM 上，这里补一次
+i18n.apply()
 
 // ---------- 网页作品没有缩略图时：缩放的实时预览，进入视野才加载 ----------
 const io = new IntersectionObserver((entries) => {
@@ -319,7 +323,7 @@ document.addEventListener('click', async (e) => {
   }
   const b = e.target.closest('button')
   if (b?.dataset.viewer === 'close') return closeViewer()
-  if (b?.dataset.viewer === 'full') return viewer.requestFullscreen().catch(() => toast('这个窗口不允许全屏'))
+  if (b?.dataset.viewer === 'full') return viewer.requestFullscreen().catch(() => toast(t('viewer.noFull')))
   if (!b || !data) return
   if (b.dataset.starter) start(data.skills.find((s) => s.name === b.dataset.starter).starter)
   else if (b.dataset.recipe) start(data.recipes.find((r) => r.id === b.dataset.recipe).prompt)
@@ -328,25 +332,25 @@ document.addEventListener('click', async (e) => {
   else if (b.dataset.voice) start(data.voice.prompts[b.dataset.voice])
   else if ('voiceHistory' in b.dataset) {
     b.disabled = true
-    const r = await fetch('api/voice/collect', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).then((x) => x.json()).catch((err) => ({ ok: false, error: err.message }))
+    const r = await fetch('api/voice/collect', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lang: i18n.lang }) }).then((x) => x.json()).catch((err) => ({ ok: false, error: err.message }))
     b.disabled = false
-    if (!r.ok) toast(`整理对话失败：${r.error}`)
-    else if (!r.prompt) toast(`在 ${r.sessions} 个会话里还没找到成段的消息。多聊几次，或先用写过的文章补充`)
-    else { toast(`整理了 ${r.messages} 条消息，正在打开新对话`); start(r.prompt) }
+    if (!r.ok) toast(t('voice.collectFailed', r.error))
+    else if (!r.prompt) toast(t('voice.collectEmpty', r.sessions))
+    else { toast(t('voice.collected', r.messages)); start(r.prompt) }
   }
   else if (b.dataset.seg) { state[b.dataset.seg] = b.dataset.skill; render() }
   else if (b.dataset.remove) {
     const w = data.works.find((x) => x.id === b.dataset.remove)
-    if (!confirm(`把「${w.title}」移出作品库？作品文件不会删除。`)) return
+    if (!confirm(t('work.removeConfirm', w.title))) return
     const r = await fetch('api/works/remove', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: w.id }) }).then((x) => x.json())
-    if (r.ok) { toast('已移出作品库'); load() }
+    if (r.ok) { toast(t('work.removed')); load() }
   }
 })
 document.addEventListener('input', (e) => { if (e.target.id === 'q') { state.q = e.target.value; render() } })
 addEventListener('hashchange', () => { render(); scrollTo(0, 0) })
 
 async function load() {
-  data = await fetch('api/catalog', { cache: 'no-store' }).then((r) => r.json())
+  data = await fetch(`api/catalog?lang=${i18n.lang}`, { cache: 'no-store' }).then((r) => r.json())
   render()
 }
 load()

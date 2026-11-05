@@ -5,7 +5,7 @@
 //
 // 卡片 PNG 转成 webp（质量 82）控制包体积；网页示例用在线字体重新渲染（内置字体的版本 1MB+）。
 import { execFileSync } from 'node:child_process'
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { makeThumb } from '../lib/thumbs.js'
@@ -16,7 +16,8 @@ const DEMO = join(DESIGN, 'demo')
 const OUT = join(ROOT, 'examples')
 const PAGE_SKILL = join(ROOT, 'skills', 'guizang-page-skill')
 
-rmSync(OUT, { recursive: true, force: true })
+// examples/en/ 是手工翻译的英文版（英文客户端用），不从 demo/ 生成，重新生成时保留
+for (const f of existsSync(OUT) ? readdirSync(OUT) : []) if (f !== 'en') rmSync(join(OUT, f), { recursive: true, force: true })
 mkdirSync(join(OUT, 'thumbs'), { recursive: true })
 
 // HTML 里引用到的本地文件（assets/…、images/…、img/…）

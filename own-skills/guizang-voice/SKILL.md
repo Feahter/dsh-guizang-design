@@ -35,6 +35,7 @@ description: 个人语气档案：从用户自己写过的文章和对话里的�
    - 幽默和情绪：有没有自嘲、反问、口语化的插话。
 3. 摘 2–3 段最能代表语气的原文（每段不超过 150 字），放在档案末尾当参照。
 4. 按下面的结构写好整份档案，用 `guizang_voice`（action: save）保存，再把档案内容给用户过目；用户说哪条不对，改好后再 save 一次。
+   用户让用英文写档案时，标题和小节用 `# Voice profile`、`Updated: YYYY-MM-DD · N samples`、`## Rhythm and structure`、`## Person and address`、`## Words I use / avoid`、`## Judgment and tone`、`## Punctuation`、`## Learned in chat`、`## In my own words`。
 
 ```markdown
 # 语气档案

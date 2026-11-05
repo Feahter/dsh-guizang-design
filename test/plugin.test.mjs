@@ -161,3 +161,52 @@ test('聊天记录：多帧 zstd 会话里只取用户亲手发的消息，去�
   assert.equal(r.messages, 1)   // 「好」太短，不进素材
   assert.match(readFileSync(out, 'utf8'), /## 2026-\d\d-\d\d · 测试会话\n\n我写东西习惯/)
 })
+
+const CJK = /[一-鿿]/
+
+test('英文客户端：skill、工作流、草稿都是英文，/skill 开头不变', async () => {
+  const { nextIssue, nextOfWork, recipesFor, skillsFor, voiceFor } = await import('../lib/recipes.js')
+  for (const s of skillsFor('en')) {
+    for (const k of ['title', 'family', 'short', 'blurb', 'starter']) assert.ok(!CJK.test(s[k]), `${s.name}.${k}`)
+    assert.ok(s.starter.startsWith(`/${s.name} `))
+    assert.equal(s.en, undefined)
+  }
+  for (const r of recipesFor('en')) {
+    for (const k of ['title', 'summary', 'prompt']) assert.ok(!CJK.test(r[k]), `${r.id}.${k}`)
+    assert.ok(r.prompt.startsWith(`/${r.steps[0]} `), r.id)
+  }
+  assert.ok(!CJK.test(voiceFor('en').articles))
+  assert.ok(!CJK.test(voiceFor('en').history({ path: '/x', sessions: 1, messages: 2, chars: 3 })))
+  const w = { skill: 'guizang-ppt-skill', title: 'T', root: '/r', entry: 'i.html', theme: 'ikb' }
+  assert.ok(!CJK.test(nextOfWork(w, 'en')))
+  assert.ok(!CJK.test(nextIssue('Weekly', w, 'en')))
+  assert.ok(CJK.test(nextOfWork(w)), '默认还是中文')
+  assert.deepEqual(skillsFor('zh').map((s) => s.title), SKILLS.map((s) => s.title))
+})
+
+test('页面文案：中英两份的 key 一样，占位符一致，英文里没有中文', () => {
+  const src = readFileSync(join(ROOT, 'gallery/i18n.js'), 'utf8')
+  const window = {}
+  const stub = { querySelectorAll: () => [], documentElement: {}, title: '' }
+  const dicts = new Function('window', 'document', 'location', 'navigator', 'URLSearchParams', `${src.replace('window.GZ_I18N = (() => {', 'window.GZ_I18N = (() => {').replace('const norm =', 'window.STR = STR\n  const norm =')}; return window`)(window, stub, { search: '' }, { languages: ['en'] }, URLSearchParams)
+  const { zh, en } = dicts.STR
+  assert.deepEqual(Object.keys(en).sort(), Object.keys(zh).sort())
+  for (const k of Object.keys(en)) {
+    assert.ok(!CJK.test(en[k]), k)
+    assert.deepEqual(en[k].match(/\{\d\}/g)?.sort() ?? [], zh[k].match(/\{\d\}/g)?.sort() ?? [], k)
+  }
+  const app = readFileSync(join(ROOT, 'gallery/app.js'), 'utf8')
+  for (const m of app.matchAll(/\bt\('([\w.]+)'/g)) assert.ok(m[1] in en, `app.js 用到了不存在的 key：${m[1]}`)
+  assert.match(app, /^i18n\.apply\(\)$/m, '静态文案要在 DOM 就绪后再套一次语言')
+  const html = readFileSync(join(ROOT, 'gallery/index.html'), 'utf8')
+  for (const m of html.matchAll(/data-i18n(?:-title|-label)?="([\w.]+)"/g)) assert.ok(m[1] in en, `index.html 用到了不存在的 key：${m[1]}`)
+})
+
+test('英文语气档案：updated 和 note 都认英文小节', async () => {
+  const { addNote, readProfile, saveProfile } = await import('../lib/voice.js')
+  saveProfile('# Voice profile\nUpdated: 2026-11-04 · 3 samples\n\n## Learned in chat\n- one\n\n## In my own words\n- two\n')
+  addNote('three')
+  const t = readProfile()
+  assert.match(t, /## Learned in chat\n- one\n- \d{4}-\d{2}-\d{2}：three\n\n## In my own words/)
+  assert.ok(!t.includes('对话中学到的'))
+})

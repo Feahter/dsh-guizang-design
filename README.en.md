@@ -69,13 +69,18 @@ Requires dsh `>=0.2.1-rc.2 <0.3.0`.
 
 ### One-click install from the plugin index (recommended)
 
-The index carries the package name, version and compatibility range, so one URL is all it takes: open **Plugins** in the sidebar, switch on **Custom plugin indexes** under **Experimental plugins**, then switch to **Discover** and add this index URL.
+The index carries the package name, version and compatibility range, so one URL is all it takes. First switch on the experimental index support on the Plugins page:
+
+- DSH `0.2.2` and later: switch on **Custom plugin indexes** under **Experimental plugins**.
+- DSH `0.2.1` line: it is called **Custom plugin markets**, under **More** beside **Experimental plugins**.
+
+The page then shows the **Installed** and **Discover** tabs. Switch to **Discover** and add this index URL:
 
 ```
 https://raw.githubusercontent.com/op7418/dsh-guizang-design/main/index.json
 ```
 
-If github.com is hard to reach from your network, use this CDN mirror instead — it can lag a few hours behind the latest release:
+If github.com is hard to reach from your network, use this CDN mirror instead — it can lag up to 12 hours behind the latest release:
 
 ```
 https://cdn.jsdelivr.net/gh/op7418/dsh-guizang-design@main/index.json

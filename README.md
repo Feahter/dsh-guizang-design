@@ -77,7 +77,23 @@ PPT、卡片、网页三个 skill 用同一套 token：
 
 需要 dsh `0.2.1-rc.2` 及以上、`0.3.0` 以下。
 
-### 在插件页面安装（桌面版和网页版都适用，推荐）
+### 用插件索引一键安装（推荐）
+
+索引里写好了包名、版本和兼容范围，加一次地址就能从列表里直接装：侧栏打开「插件」，在「实验性插件」下启用「自定义插件索引」，切到「发现」，把下面这条地址加进去。
+
+```
+https://raw.githubusercontent.com/op7418/dsh-guizang-design/main/index.json
+```
+
+GitHub 直连不通时换成这个 CDN 镜像，代价是它可能比最新发布晚几个小时：
+
+```
+https://cdn.jsdelivr.net/gh/op7418/dsh-guizang-design@main/index.json
+```
+
+列表里点「歸藏设计」的安装，装完点「立即启用」。索引里列的就是 npm 上的 `dsh-guizang-design`，和下面手填包名装到的是同一个包。
+
+### 在插件页面安装（桌面版和网页版都适用）
 
 1. 侧栏打开「插件」，点「添加插件」。
 2. 包名填 `dsh-guizang-design`，点安装。
@@ -184,8 +200,11 @@ git clone https://github.com/op7418/dsh-guizang-design.git
 cd dsh-guizang-design
 npm install
 npm test
+npm run index                  # 发布后更新 index.json 的版本和发布时间
 dsh plugin --profile web add link:$PWD   # 本地调试
 ```
+
+`index.json` 是插件市场索引：`npm run index` 按 npm 上的最新发布刷新里面的版本号和发布时间，所以每次发版后跑一次，索引里才是新版本。
 
 | 目录 | 说明 |
 |---|---|
@@ -194,7 +213,7 @@ dsh plugin --profile web add link:$PWD   # 本地调试
 | `skills/` | 独立仓库的快照，用 `node tools/vendor-skills.mjs` 更新，不要直接改 |
 | `own-skills/` | 插件自己的 skill（语气档案） |
 | `examples/` | 官方示例，用 `node tools/vendor-examples.mjs` 生成 |
-| `scripts/` | `library.mjs`（作品库）、`voice.mjs`（语气档案）的命令行版本，手动处理用 |
+| `scripts/` | `library.mjs`（作品库）、`voice.mjs`（语气档案）的命令行版本，手动处理用；`build-index.mjs` 生成插件市场索引 |
 
 ## License
 

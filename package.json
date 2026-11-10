@@ -64,7 +64,11 @@
   },
   "scripts": {
     "vendor": "node tools/vendor-skills.mjs && node tools/vendor-examples.mjs",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "index": "node scripts/build-index.mjs"
   },
-  "license": "AGPL-3.0-only"
+  "license": "AGPL-3.0-only",
+  "devDependencies": {
+    "semver": "^7.8.5"
+  }
 }

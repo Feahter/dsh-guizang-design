@@ -1,0 +1,68 @@
+{
+  "format": 1,
+  "title": {
+    "en": "Guizang Design",
+    "zh": "歸藏设计"
+  },
+  "description": {
+    "en": "The plugin index for Guizang Design: one URL, one-click install.",
+    "zh": "歸藏设计的插件索引：一条地址，一键安装。"
+  },
+  "metadata": {
+    "categories": {
+      "design": {
+        "title": {
+          "en": "Design",
+          "zh": "设计"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-guizang-design",
+      "title": {
+        "en": "Guizang Design",
+        "zh": "歸藏设计"
+      },
+      "description": {
+        "en": "Web slide decks, social cards, typeset web pages and Chinese de-AI editing from one design system, plus a work gallery, a content workflow and a writing-voice profile.",
+        "zh": "网页 PPT、图文卡片、网页排版、去 AI 味四个 skill，共用一套设计系统；作品库收着官方示例和你做过的作品，还有内容生产工作流和语气档案。"
+      },
+      "icon": "icon.png",
+      "author": "op7418",
+      "homepage": "https://github.com/op7418/dsh-guizang-design#readme",
+      "repository": {
+        "url": "https://github.com/op7418/dsh-guizang-design"
+      },
+      "metadata": {
+        "category": "design",
+        "keywords": [
+          "dsh-plugin",
+          "deepseek-harness",
+          "dsh",
+          "skills",
+          "ppt",
+          "design-system",
+          "typography",
+          "设计",
+          "幻灯片",
+          "图文卡片",
+          "网页排版"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.1.4",
+          "publishTimestamp": 1793866001,
+          "source": {
+            "type": "npm"
+          },
+          "engines": {
+            "dsh": ">=0.2.1-rc.2 <0.3.0"
+          }
+        }
+      ]
+    }
+  ]
+}
